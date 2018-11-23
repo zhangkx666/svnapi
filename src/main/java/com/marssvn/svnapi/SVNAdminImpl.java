@@ -5,6 +5,7 @@ import com.marssvn.svnapi.common.StringUtils;
 import com.marssvn.svnapi.exception.SVNException;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.IOException;
  *
  * @author zhangkx
  */
+@Component
 public class SVNAdminImpl implements ISVNAdmin {
 
     /**
@@ -24,7 +26,7 @@ public class SVNAdminImpl implements ISVNAdmin {
     /**
      * createRepository a new repository
      *
-     * @param rootPath       root path
+     * @param rootPath       root path, use user.home if null
      * @param repositoryName repository name
      * @return repository path
      */

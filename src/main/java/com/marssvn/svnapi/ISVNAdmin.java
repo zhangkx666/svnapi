@@ -12,7 +12,7 @@ public interface ISVNAdmin {
     /**
      * createRepository a new repository
      *
-     * @param rootPath root path
+     * @param rootPath root path, use user.home if null
      * @param repoName repository name
      * @return repository path
      */
@@ -24,6 +24,7 @@ public interface ISVNAdmin {
      * @param rootPath    root path
      * @param oldRepoName old repository name
      * @param newRepoName new repository name
+     * @throws IOException IOException
      */
     void moveRepository(String rootPath, String oldRepoName, String newRepoName) throws IOException;
 

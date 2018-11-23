@@ -11,12 +11,13 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Component
 public class SVNClientImpl implements ISVNClient {
 
     /**
@@ -210,6 +211,7 @@ public class SVNClientImpl implements ISVNClient {
      * get file by path
      *
      * @param path file path
+     * @param revision file revision
      * @return SVNNodeItem
      */
     public SVNNodeItem getFile(String path, long revision) {
@@ -365,7 +367,7 @@ public class SVNClientImpl implements ISVNClient {
      * @param path    directory or file path
      * @param comment lock comment
      * @param force   force to steal the lock from another user or working copy
-     * @return
+     * @return boolean
      */
     @Override
     public boolean lock(String path, String comment, boolean force) {
@@ -377,7 +379,7 @@ public class SVNClientImpl implements ISVNClient {
      *
      * @param path  directory or file path
      * @param force force to break the lock
-     * @return
+     * @return boolean
      */
     @Override
     public boolean unLock(String path, boolean force) {
@@ -413,7 +415,7 @@ public class SVNClientImpl implements ISVNClient {
      * @param sourcePath source path
      * @param destPath   dest path
      * @param message    log message
-     * @return
+     * @return boolean
      */
     @Override
     public boolean move(String sourcePath, String destPath, String message) {
@@ -425,7 +427,7 @@ public class SVNClientImpl implements ISVNClient {
      *
      * @param path     path
      * @param revision revision, default is HEAD
-     * @return
+     * @return string
      */
     @Override
     public String export(String path, long revision) {

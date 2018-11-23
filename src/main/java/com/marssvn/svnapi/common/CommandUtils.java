@@ -22,7 +22,6 @@ public class CommandUtils {
      * execute command, windows: cmd,  linux: /bin/sh
      *
      * @param command command
-     * @return Process
      * @throws IOException IOException
      */
     public static void execute(String command) throws IOException {

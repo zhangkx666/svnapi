@@ -48,7 +48,7 @@ public class StringUtils {
 
     /**
      * convert windows path to linux path
-     * eg. C:\windows\log -> /C:/windows/log
+     * eg. C:\windows\log to /C:/windows/log
      *
      * @param windowsPath windows path
      * @return linux path

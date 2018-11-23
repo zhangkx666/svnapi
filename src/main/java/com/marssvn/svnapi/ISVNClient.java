@@ -66,7 +66,7 @@ public interface ISVNClient {
      * @param path    directory or file path
      * @param comment lock comment
      * @param force   force to steal the lock from another user or working copy
-     * @return
+     * @return boolean
      */
     boolean lock(String path, String comment, boolean force);
 
@@ -75,7 +75,7 @@ public interface ISVNClient {
      *
      * @param path  directory or file path
      * @param force force to break the lock
-     * @return
+     * @return boolean
      */
     boolean unLock(String path, boolean force);
 
@@ -103,7 +103,7 @@ public interface ISVNClient {
      * @param sourcePath source path
      * @param destPath   dest path
      * @param message    log message
-     * @return
+     * @return boolean
      */
     boolean move(String sourcePath, String destPath, String message);
 
@@ -112,7 +112,7 @@ public interface ISVNClient {
      *
      * @param path     path
      * @param revision revision, default is HEAD
-     * @return
+     * @return string
      */
     String export(String path, long revision);
 

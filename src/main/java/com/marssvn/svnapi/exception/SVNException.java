@@ -24,6 +24,7 @@ public class SVNException  extends RuntimeException {
 
     /**
      * New com.marssvn.svnapi.exception.SVNException by errorCode and message
+     * @param errorCode error code
      * @param message message
      */
     public SVNException(String errorCode, String message) {
