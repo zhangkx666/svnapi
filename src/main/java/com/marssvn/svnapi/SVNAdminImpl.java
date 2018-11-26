@@ -36,23 +36,26 @@ public class SVNAdminImpl implements ISVNAdmin {
             // svn root path, here we use use home path
             if (StringUtils.isBlank(rootPath)) {
                 rootPath = System.getProperty("user.home") + "/svn_reps";
-                if (!(new File(rootPath)).exists()) {
-                    FileUtils.forceMkdir(new File(rootPath));
-                }
             }
-            String path = rootPath + "/" + repositoryName;
-            String command = "svnadmin create " + path;
 
-            // execute svnadmin createRepository command
+            // if repository root path not exists, mkdir
+            File repoRoot = new File(rootPath);
+            if (!repoRoot.exists()) {
+                FileUtils.forceMkdir(repoRoot);
+            }
+
+            // execute svnadmin create command
+            String repoPath = rootPath + "/" + repositoryName;
+            String command = "svnadmin create " + repoPath;
             CommandUtils.execute(command);
 
             // backup svn repository settings
-            backupSettings(path);
+            backupSettings(repoPath);
 
             // write svnserve.conf
-            writeSvnserveConf(path, repositoryName);
+            writeSvnserveConf(repoPath, repositoryName);
 
-            return path;
+            return repoPath;
         } catch (IOException e) {
             e.printStackTrace();
             throw new SVNException(e.getMessage());

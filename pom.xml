@@ -6,7 +6,7 @@
 
     <groupId>marssvn.com</groupId>
     <artifactId>svnapi</artifactId>
-    <version>1.0.0</version>
+    <version>0.0.1</version>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
