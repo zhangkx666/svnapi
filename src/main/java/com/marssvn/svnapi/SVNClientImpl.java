@@ -6,11 +6,12 @@ import com.marssvn.svnapi.enums.SVNNodeKind;
 import com.marssvn.svnapi.exception.SVNException;
 import com.marssvn.svnapi.model.*;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,19 +22,9 @@ import java.util.List;
 public class SVNClientImpl implements ISVNClient {
 
     /**
-     * log4j.Logger
+     * slf4j.Logger
      */
-    private Logger logger = Logger.getLogger("SVNClientImpl");
-
-    /**
-     * directory
-     */
-    private final static String DIRECTORY = "directory";
-
-    /**
-     * file
-     */
-    private final static String FILE = "file";
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private SVNRepository repository;
 
@@ -47,8 +38,11 @@ public class SVNClientImpl implements ISVNClient {
      */
     private SVNUser svnUser;
 
-    public SVNClientImpl(String rootPath, SVNUser svnUser) {
+    public void setRootPath(String rootPath) {
         this.rootPath = rootPath;
+    }
+
+    public void setSvnUser(SVNUser svnUser) {
         this.svnUser = svnUser;
     }
 
@@ -63,9 +57,12 @@ public class SVNClientImpl implements ISVNClient {
         if (this.svnUser == null) {
             throw new SVNException("SVN user args are required");
         }
+        if (dirPath == null) {
+            throw new SVNException("Directory path can't be null");
+        }
 
         try {
-            String path = this.rootPath + "/" + (dirPath == null ? "" : dirPath.trim());
+            String path = this.rootPath + "/" + dirPath.trim();
             String command = "svn mkdir " + path + " -q -m \"" + message + "\" --parents" + this.svnUser.getAuthString();
 
             // print debug log
@@ -158,9 +155,9 @@ public class SVNClientImpl implements ISVNClient {
                 String nodeKind = entry.attributeValue("kind");
 
                 // node kind: directory -> DIR, file -> FILE, else -> NONE
-                if (FILE.equals(nodeKind)) {
+                if ("file".equals(nodeKind)) {
                     item.setNodeKind(SVNNodeKind.FILE);
-                } else if (DIRECTORY.equals(nodeKind)) {
+                } else if ("directory".equals(nodeKind)) {
                     item.setNodeKind(SVNNodeKind.DIR);
                 } else {
                     item.setNodeKind(SVNNodeKind.NONE);

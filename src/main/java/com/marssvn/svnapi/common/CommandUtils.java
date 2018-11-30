@@ -2,7 +2,8 @@ package com.marssvn.svnapi.common;
 
 import com.marssvn.svnapi.exception.SVNException;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -16,7 +17,7 @@ public class CommandUtils {
     /**
      * log4j.Logger
      */
-    private static Logger logger = Logger.getLogger("CommandUtils");
+    private static Logger logger = LoggerFactory.getLogger(CommandUtils.class);
 
     /**
      * execute command, windows: cmd,  linux: /bin/sh

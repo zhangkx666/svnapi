@@ -10,8 +10,6 @@ public class SVNAdminImplTest {
 
     /**
      * create repository
-     *
-     * @throws Exception
      */
     @Test
     public void testCreateRepository_01() throws Exception {

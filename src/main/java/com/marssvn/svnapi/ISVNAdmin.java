@@ -15,8 +15,9 @@ public interface ISVNAdmin {
      * @param rootPath root path, use user.home if null
      * @param repoName repository name
      * @return repository path
+     * @throws IOException IOException
      */
-    String createRepository(String rootPath, String repoName);
+    String createRepository(String rootPath, String repoName) throws IOException;
 
     /**
      * moveRepository repository
