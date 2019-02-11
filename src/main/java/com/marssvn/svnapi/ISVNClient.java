@@ -2,6 +2,7 @@ package com.marssvn.svnapi;
 
 import com.marssvn.svnapi.model.SVNLock;
 import com.marssvn.svnapi.model.SVNNodeItem;
+import com.marssvn.svnapi.model.SVNUser;
 
 import java.util.List;
 
@@ -11,6 +12,18 @@ import java.util.List;
  * @author zhangkx
  */
 public interface ISVNClient {
+
+    /**
+     * set root path
+     * @param rootPath svn root path
+     */
+    void setRootPath(String rootPath);
+
+    /**
+     * set svn user
+     * @param svnUser svn user
+     */
+    void setSvnUser(SVNUser svnUser);
 
     /**
      * make directory, will make parent directories also

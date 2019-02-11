@@ -1,5 +1,6 @@
 package com.marssvn.svnapi;
 
+import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.DateUtils;
 import com.marssvn.svnapi.common.StringUtils;
 import com.marssvn.svnapi.enums.SVNNodeKind;
@@ -38,10 +39,20 @@ public class SVNClientImpl implements ISVNClient {
      */
     private SVNUser svnUser;
 
+    /**
+     * set root path
+     * @param rootPath svn root path
+     */
+    @Override
     public void setRootPath(String rootPath) {
         this.rootPath = rootPath;
     }
 
+    /**
+     * set svn user
+     * @param svnUser svn user
+     */
+    @Override
     public void setSvnUser(SVNUser svnUser) {
         this.svnUser = svnUser;
     }
@@ -61,33 +72,10 @@ public class SVNClientImpl implements ISVNClient {
             throw new SVNException("Directory path can't be null");
         }
 
-        try {
-            String path = this.rootPath + "/" + dirPath.trim();
-            String command = "svn mkdir " + path + " -q -m \"" + message + "\" --parents" + this.svnUser.getAuthString();
-
-            // print debug log
-            logger.debug("execute command: " + command);
-
-            // execute svn mkdir command
-            Process process = Runtime.getRuntime().exec(command);
-
-            // check error
-            String errorMsg = IOUtils.toString(process.getErrorStream(), "UTF-8");
-            if (StringUtils.isNotBlank(errorMsg)) {
-
-                // svn: E170001: Authentication error from server: Username not found
-                // svn: E170001: Authentication error from server: Password incorrect
-                if (errorMsg.contains("E170001")) {
-                    errorMsg = errorMsg.substring(errorMsg.indexOf("svn: E170001"));
-                }
-
-                // svn: E160020: File already exists: filesystem
-                String[] error = errorMsg.split(": ");
-                throw new SVNException(error[1], errorMsg);
-            }
-        } catch (IOException e) {
-            throw new SVNException(e.getMessage());
-        }
+        // execute svn mkdir command
+        String path = this.rootPath + "/" + dirPath.trim();
+        String command = "svn mkdir " + path + " -q -m \"" + message + "\" --parents" + this.svnUser.getAuthString();
+        CommandUtils.execute(command);
     }
 
     /**

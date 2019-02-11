@@ -1,7 +1,5 @@
 package com.marssvn.svnapi;
 
-import java.io.IOException;
-
 /**
  * svn admin interface
  *
@@ -15,9 +13,8 @@ public interface ISVNAdmin {
      * @param rootPath root path, use user.home if null
      * @param repoName repository name
      * @return repository path
-     * @throws IOException IOException
      */
-    String createRepository(String rootPath, String repoName) throws IOException;
+    String createRepository(String rootPath, String repoName);
 
     /**
      * moveRepository repository
@@ -25,9 +22,8 @@ public interface ISVNAdmin {
      * @param rootPath    root path
      * @param oldRepoName old repository name
      * @param newRepoName new repository name
-     * @throws IOException IOException
      */
-    void moveRepository(String rootPath, String oldRepoName, String newRepoName) throws IOException;
+    void moveRepository(String rootPath, String oldRepoName, String newRepoName);
 
     /**
      * deleteRepository repository

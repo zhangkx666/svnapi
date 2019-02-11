@@ -23,23 +23,27 @@ public class CommandUtils {
      * execute command, windows: cmd,  linux: /bin/sh
      *
      * @param command command
-     * @throws IOException IOException
      */
-    public static void execute(String command) throws IOException {
-        // os
-        String os = System.getProperty("os.name").toLowerCase();
+    public static void execute(String command) {
+        try {
+            // os
+            String os = System.getProperty("os.name").toLowerCase();
 
-        Process process;
-        if (os.startsWith("win")) {
-            logger.debug("cmd: " + command);
-            process = Runtime.getRuntime().exec(new String[]{"cmd", "/c", command});
-        } else {
-            logger.debug("/bin/sh: " + command);
-            process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-ce", command});
-        }
-        String errorMsg = IOUtils.toString(process.getErrorStream(), System.getProperty("sun.jnu.encoding"));
-        if (StringUtils.isNotBlank(errorMsg)) {
-            throw new SVNException(errorMsg);
+            Process process;
+            if (os.startsWith("win")) {
+                logger.debug("cmd: " + command);
+                process = Runtime.getRuntime().exec(new String[]{"cmd", "/c", command});
+            } else {
+                logger.debug("/bin/sh: " + command);
+                process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-ce", command});
+            }
+            String errorMsg = IOUtils.toString(process.getErrorStream(), System.getProperty("sun.jnu.encoding"));
+            if (StringUtils.isNotBlank(errorMsg)) {
+                throw new SVNException(errorMsg);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SVNException(e.getMessage());
         }
     }
 }

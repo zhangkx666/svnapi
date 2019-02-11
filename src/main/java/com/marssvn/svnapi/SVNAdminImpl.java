@@ -2,6 +2,7 @@ package com.marssvn.svnapi;
 
 import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.StringUtils;
+import com.marssvn.svnapi.exception.SVNException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,33 +30,37 @@ public class SVNAdminImpl implements ISVNAdmin {
      * @param rootPath       root path, use user.home if null
      * @param repositoryName repository name
      * @return repository path
-     * @throws IOException IOException
      */
     @Override
-    public String createRepository(String rootPath, String repositoryName) throws IOException {
-        // svn root path, here we use use home path
-        if (StringUtils.isBlank(rootPath)) {
-            rootPath = System.getProperty("user.home") + "/svn_reps";
+    public String createRepository(String rootPath, String repositoryName) {
+        try {
+            // svn root path, here we use use home path
+            if (StringUtils.isBlank(rootPath)) {
+                rootPath = System.getProperty("user.home") + "/svn_reps";
+            }
+
+            // if repository root path not exists, mkdir
+            File repoRoot = new File(rootPath);
+            if (!repoRoot.exists()) {
+                FileUtils.forceMkdir(repoRoot);
+            }
+
+            // execute svnadmin create command
+            String repoPath = rootPath + "/" + repositoryName;
+            String command = "svnadmin create " + repoPath;
+            CommandUtils.execute(command);
+
+            // backup svn repository settings
+            backupSettings(repoPath);
+
+            // write svnserve.conf
+            writeSvnserveConf(repoPath, repositoryName);
+
+            return repoPath;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SVNException(e.getMessage());
         }
-
-        // if repository root path not exists, mkdir
-        File repoRoot = new File(rootPath);
-        if (!repoRoot.exists()) {
-            FileUtils.forceMkdir(repoRoot);
-        }
-
-        // execute svnadmin create command
-        String repoPath = rootPath + "/" + repositoryName;
-        String command = "svnadmin create " + repoPath;
-        CommandUtils.execute(command);
-
-        // backup svn repository settings
-        backupSettings(repoPath);
-
-        // write svnserve.conf
-        writeSvnserveConf(repoPath, repositoryName);
-
-        return repoPath;
     }
 
     /**
@@ -64,13 +69,20 @@ public class SVNAdminImpl implements ISVNAdmin {
      * @param rootPath    root path
      * @param oldRepoName old repository name
      * @param newRepoName new repository name
-     * @throws IOException IOException
      */
     @Override
-    public void moveRepository(String rootPath, String oldRepoName, String newRepoName) throws IOException {
-        File oldFolder = new File(rootPath + "/" + oldRepoName);
-        File newFolder = new File(rootPath + "/" + newRepoName);
-        FileUtils.moveDirectory(oldFolder, newFolder);
+    public void moveRepository(String rootPath, String oldRepoName, String newRepoName) {
+        if (StringUtils.isBlank(rootPath)) {
+            rootPath = System.getProperty("user.home") + "/svn_reps";
+        }
+        try {
+            File oldFolder = new File(rootPath + "/" + oldRepoName);
+            File newFolder = new File(rootPath + "/" + newRepoName);
+            FileUtils.moveDirectory(oldFolder, newFolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SVNException(e.getMessage());
+        }
     }
 
     /**
@@ -83,6 +95,7 @@ public class SVNAdminImpl implements ISVNAdmin {
         try {
             FileUtils.deleteDirectory(new File(repoPath));
         } catch (IOException e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
         }
     }
