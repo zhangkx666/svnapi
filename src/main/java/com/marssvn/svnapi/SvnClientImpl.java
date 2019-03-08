@@ -4,7 +4,7 @@ import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.DateUtils;
 import com.marssvn.svnapi.common.StringUtils;
 import com.marssvn.svnapi.enums.SVNNodeKind;
-import com.marssvn.svnapi.exception.SVNException;
+import com.marssvn.svnapi.exception.SvnException;
 import com.marssvn.svnapi.model.*;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
@@ -19,8 +19,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * SVN client
+ *
+ * @author zhangkx
+ */
 @Component
-public class SVNClientImpl implements ISVNClient {
+public class SvnClientImpl implements ISvnClient {
 
     /**
      * slf4j.Logger
@@ -41,6 +46,7 @@ public class SVNClientImpl implements ISVNClient {
 
     /**
      * set root path
+     *
      * @param rootPath svn root path
      */
     @Override
@@ -50,6 +56,7 @@ public class SVNClientImpl implements ISVNClient {
 
     /**
      * set svn user
+     *
      * @param svnUser svn user
      */
     @Override
@@ -66,10 +73,10 @@ public class SVNClientImpl implements ISVNClient {
     @Override
     public void mkdir(String dirPath, String message) {
         if (this.svnUser == null) {
-            throw new SVNException("SVN user args are required");
+            throw new SvnException("SVN user args are required");
         }
         if (dirPath == null) {
-            throw new SVNException("Directory path can't be null");
+            throw new SvnException("Directory path can't be null");
         }
 
         // execute svn mkdir command
@@ -100,12 +107,12 @@ public class SVNClientImpl implements ISVNClient {
             String errorMsg = IOUtils.toString(process.getErrorStream(), "UTF-8");
             if (StringUtils.isNotBlank(errorMsg)) {
                 String[] error = errorMsg.split(": ");
-                throw new SVNException(error[1], errorMsg);
+                throw new SvnException(error[1], errorMsg);
             }
 
             return Long.valueOf(IOUtils.toString(process.getInputStream(), "UTF-8"));
         } catch (IOException e) {
-            throw new SVNException(e.getMessage());
+            throw new SvnException(e.getMessage());
         }
     }
 
@@ -195,7 +202,7 @@ public class SVNClientImpl implements ISVNClient {
     /**
      * get file by path
      *
-     * @param path file path
+     * @param path     file path
      * @param revision file revision
      * @return SVNNodeItem
      */
@@ -220,7 +227,7 @@ public class SVNClientImpl implements ISVNClient {
 
 //            List<SvnInfoEntry> entryList = xmlSerializer.read(SvnInfo.class, infoXml).getEntryList();
 //            if (entryList.isEmpty()) {
-//                throw new SVNException("svn info entry is empty");
+//                throw new SvnException("svn info entry is empty");
 //            }
 //
 //            SvnInfoEntry infoEntry = entryList.get(0);
@@ -303,7 +310,7 @@ public class SVNClientImpl implements ISVNClient {
             return nodeItem;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new SVNException(e.getMessage());
+            throw new SvnException(e.getMessage());
         }
     }
 

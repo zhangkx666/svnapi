@@ -2,7 +2,7 @@ package com.marssvn.svnapi;
 
 import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.StringUtils;
-import com.marssvn.svnapi.exception.SVNException;
+import com.marssvn.svnapi.exception.SvnException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ import java.io.IOException;
  * @author zhangkx
  */
 @Component
-public class SVNAdminImpl implements ISVNAdmin {
+public class SvnAdminImpl implements ISvnAdmin {
 
     /**
      * slf4j.Logger
@@ -59,7 +59,7 @@ public class SVNAdminImpl implements ISVNAdmin {
             return repoPath;
         } catch (IOException e) {
             e.printStackTrace();
-            throw new SVNException(e.getMessage());
+            throw new SvnException(e.getMessage());
         }
     }
 
@@ -81,7 +81,7 @@ public class SVNAdminImpl implements ISVNAdmin {
             FileUtils.moveDirectory(oldFolder, newFolder);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new SVNException(e.getMessage());
+            throw new SvnException(e.getMessage());
         }
     }
 

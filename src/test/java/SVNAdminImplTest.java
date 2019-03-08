@@ -1,6 +1,6 @@
-import com.marssvn.svnapi.ISVNAdmin;
-import com.marssvn.svnapi.SVNAdminImpl;
-import com.marssvn.svnapi.exception.SVNException;
+import com.marssvn.svnapi.ISvnAdmin;
+import com.marssvn.svnapi.SvnAdminImpl;
+import com.marssvn.svnapi.exception.SvnException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,19 +13,19 @@ public class SVNAdminImplTest {
      */
     @Test
     public void testCreateRepository_01() throws Exception {
-        ISVNAdmin svnAdmin = new SVNAdminImpl();
-        String repoName = "test_2018_01";
+        ISvnAdmin svnAdmin = new SvnAdminImpl();
+        String repoName = "test_2019_01";
         svnAdmin.deleteRepository(System.getProperty("user.home") + "/svn_reps/" + repoName);
         svnAdmin.createRepository(null, repoName);
     }
 
     /**
-     * throw SVNException when repository exists
+     * throw SvnException when repository exists
      */
-    @Test(expected = SVNException.class)
+    @Test(expected = SvnException.class)
     public void testCreateRepository_02() throws Exception {
-        ISVNAdmin svnAdmin = new SVNAdminImpl();
-        String repoName = "test_2018_01";
+        ISvnAdmin svnAdmin = new SvnAdminImpl();
+        String repoName = "test_2019_01";
 
         svnAdmin.createRepository(null, repoName);
     }
@@ -35,10 +35,10 @@ public class SVNAdminImplTest {
      */
     @Test
     public void testCreateRepository_03() throws Exception {
-        ISVNAdmin svnAdmin = new SVNAdminImpl();
+        ISvnAdmin svnAdmin = new SvnAdminImpl();
         String rootPath = System.getProperty("user.home") + "/svn_reps/";
-        String oldRepoName = "test_2018_01";
-        String newRepoName = "test_2018_02";
+        String oldRepoName = "test_2019_01";
+        String newRepoName = "test_2019_02";
         File repo = new File(rootPath + oldRepoName);
         Assert.assertTrue(repo.exists());
         svnAdmin.moveRepository(rootPath, oldRepoName, newRepoName);
@@ -52,8 +52,8 @@ public class SVNAdminImplTest {
      */
     @Test
     public void testCreateRepository_04() throws Exception {
-        ISVNAdmin svnAdmin = new SVNAdminImpl();
-        String repoPath = System.getProperty("user.home") + "/svn_reps/" + "test_2018_02";
+        ISvnAdmin svnAdmin = new SvnAdminImpl();
+        String repoPath = System.getProperty("user.home") + "/svn_reps/" + "test_2019_02";
         File repo = new File(repoPath);
         Assert.assertTrue(repo.exists());
         svnAdmin.deleteRepository(repoPath);

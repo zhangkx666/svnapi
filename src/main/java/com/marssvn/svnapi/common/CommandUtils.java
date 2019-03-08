@@ -1,6 +1,6 @@
 package com.marssvn.svnapi.common;
 
-import com.marssvn.svnapi.exception.SVNException;
+import com.marssvn.svnapi.exception.SvnException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +39,11 @@ public class CommandUtils {
             }
             String errorMsg = IOUtils.toString(process.getErrorStream(), System.getProperty("sun.jnu.encoding"));
             if (StringUtils.isNotBlank(errorMsg)) {
-                throw new SVNException(errorMsg);
+                throw new SvnException(errorMsg);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new SVNException(e.getMessage());
+            throw new SvnException(e.getMessage());
         }
     }
 }

@@ -5,7 +5,7 @@ package com.marssvn.svnapi;
  *
  * @author zhangkx
  */
-public interface ISVNAdmin {
+public interface ISvnAdmin {
 
     /**
      * createRepository a new repository

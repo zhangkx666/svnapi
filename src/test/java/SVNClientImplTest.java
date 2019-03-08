@@ -1,4 +1,4 @@
-//import com.marssvn.svnapi.ISVNClient;
+//import com.marssvn.svnapi.ISvnClient;
 //import com.marssvn.svnapi.SVNClientImpl;
 //import com.marssvn.svnapi.model.SVNUser;
 //import org.junit.After;
@@ -28,7 +28,7 @@
 //    @Test
 //    public void testMakeDir() throws Exception {
 //        SVNUser svnUser = new SVNUser("zhangkx", "123456");
-//        ISVNClient svnClient = new SVNClientImpl("svn://127.0.0.1/marssvn", svnUser);
+//        ISvnClient svnClient = new SVNClientImpl("svn://127.0.0.1/marssvn", svnUser);
 //
 //        svnClient.mkdir("testMakeDir11", "test make dir");
 //    }
