@@ -5,7 +5,7 @@ package com.marssvn.svnapi.enums;
  *
  * @author zhangkx
  */
-public enum SVNNodeKind {
+public enum ESvnNodeKind {
 
     /**
      * directory
