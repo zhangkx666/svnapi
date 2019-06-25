@@ -10,7 +10,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class SVNRepository {
+public class SvnRepository {
 
     /**
      * repository rootPath
@@ -27,7 +27,13 @@ public class SVNRepository {
      */
     private long headRevision;
 
-    public SVNRepository(String rootPath) {
-        this.rootPath = rootPath;
-    }
+    /**
+     * admin account
+     */
+    private String adminAccount;
+
+    /**
+     * admin password
+     */
+    private String adminPassword;
 }

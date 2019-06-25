@@ -1,6 +1,6 @@
 package com.marssvn.svnapi.model;
 
-import com.marssvn.svnapi.enums.SVNNodeKind;
+import com.marssvn.svnapi.enums.ESvnNodeKind;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,7 +33,7 @@ public class SVNNodeItem extends BaseBean {
     /**
      * node kind: DIR, FILE, NONE
      */
-    private SVNNodeKind nodeKind;
+    private ESvnNodeKind nodeKind;
 
     /**
      * last changed
