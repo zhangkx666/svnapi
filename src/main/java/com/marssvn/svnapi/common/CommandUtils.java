@@ -20,30 +20,47 @@ public class CommandUtils {
     private static Logger logger = LoggerFactory.getLogger(CommandUtils.class);
 
     /**
+     * windows
+     */
+    private final static String WIN = "win";
+
+    /**
+     * linux
+     */
+    private final static String LINUX = "linux";
+
+    /**
      * execute command, windows: cmd,  linux: /bin/sh
      *
      * @param command command
      */
     public static void execute(String command) {
+        Process process = null;
         try {
-            // os
             String os = System.getProperty("os.name").toLowerCase();
 
-            Process process;
-            if (os.startsWith("win")) {
-                logger.debug("cmd: " + command);
-                process = Runtime.getRuntime().exec(new String[]{"cmd", "/c", command});
+            if (os.startsWith(WIN)) {
+                command = "cmd /c " + command;
+
+            } else if (os.startsWith(LINUX)) {
+                command = "/bin/sh -ce " + command;
             } else {
-                logger.debug("/bin/sh: " + command);
-                process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-ce", command});
+                throw new SvnException("Support Windows and Linux only!");
             }
-            String errorMsg = IOUtils.toString(process.getErrorStream(), System.getProperty("sun.jnu.encoding"));
+
+            logger.debug(command);
+            process = Runtime.getRuntime().exec(command);
+            process.waitFor();
+            String errorMsg = IOUtils.toString(process.getErrorStream(), "UTF-8");
             if (StringUtils.isNotBlank(errorMsg)) {
                 throw new SvnException(errorMsg);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {
             throw new SvnException(e.getMessage());
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
         }
     }
 }
