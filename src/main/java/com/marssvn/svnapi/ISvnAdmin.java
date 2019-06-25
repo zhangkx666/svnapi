@@ -1,5 +1,7 @@
 package com.marssvn.svnapi;
 
+import com.marssvn.svnapi.enums.ERepositoryType;
+
 /**
  * svn admin interface
  *
@@ -12,9 +14,10 @@ public interface ISvnAdmin {
      *
      * @param rootPath root path, use user.home if null
      * @param repoName repository name
+     * @param repoType repository type, fsfs: FSFS(default), bdb: Berkeley DB
      * @return repository path
      */
-    String createRepository(String rootPath, String repoName);
+    String createRepository(String rootPath, String repoName, ERepositoryType repoType);
 
     /**
      * moveRepository repository

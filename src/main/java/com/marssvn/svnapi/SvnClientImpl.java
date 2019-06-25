@@ -3,7 +3,7 @@ package com.marssvn.svnapi;
 import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.DateUtils;
 import com.marssvn.svnapi.common.StringUtils;
-import com.marssvn.svnapi.enums.SVNNodeKind;
+import com.marssvn.svnapi.enums.ESvnNodeKind;
 import com.marssvn.svnapi.exception.SvnException;
 import com.marssvn.svnapi.model.*;
 import org.apache.commons.io.IOUtils;
@@ -30,9 +30,9 @@ public class SvnClientImpl implements ISvnClient {
     /**
      * slf4j.Logger
      */
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(SvnClientImpl.class);
 
-    private SVNRepository repository;
+    private SvnRepository repository;
 
     /**
      * root path
@@ -116,7 +116,12 @@ public class SvnClientImpl implements ISvnClient {
         }
     }
 
-
+    /**
+     * get file list
+     * @param path
+     * @param revision
+     * @return
+     */
     public SVNNodeItem getList(String path, long revision) {
 
         // file revision
@@ -151,11 +156,11 @@ public class SvnClientImpl implements ISvnClient {
 
                 // node kind: directory -> DIR, file -> FILE, else -> NONE
                 if ("file".equals(nodeKind)) {
-                    item.setNodeKind(SVNNodeKind.FILE);
+                    item.setNodeKind(ESvnNodeKind.FILE);
                 } else if ("directory".equals(nodeKind)) {
-                    item.setNodeKind(SVNNodeKind.DIR);
+                    item.setNodeKind(ESvnNodeKind.DIR);
                 } else {
-                    item.setNodeKind(SVNNodeKind.NONE);
+                    item.setNodeKind(ESvnNodeKind.NONE);
                 }
 
                 item.setName(entry.elementText("name"));
@@ -267,11 +272,11 @@ public class SvnClientImpl implements ISvnClient {
 //
 //            // DIR: directory   FILE: file,  NONE: nothing
 //            if ("file".equals(infoEntry.getKind())) {
-//                nodeItem.setNodeKind(SVNNodeKind.FILE);
+//                nodeItem.setNodeKind(ESvnNodeKind.FILE);
 //            } else if ("directory".equals(infoEntry.getKind())) {
-//                nodeItem.setNodeKind(SVNNodeKind.DIR);
+//                nodeItem.setNodeKind(ESvnNodeKind.DIR);
 //            } else {
-//                nodeItem.setNodeKind(SVNNodeKind.NONE);
+//                nodeItem.setNodeKind(ESvnNodeKind.NONE);
 //            }
 //
 //            // lock
