@@ -6,7 +6,9 @@ package com.marssvn.svnapi.common;
  */
 public class StringUtils {
 
-    /**
+    public final static String SLASH = "/";
+
+   /**
      * check if the str is empty
      *
      * @param str string
@@ -47,19 +49,19 @@ public class StringUtils {
     }
 
     /**
-     * convert windows path to linux path
+     * convert backslash to Slash
      * eg. C:\windows\log to /C:/windows/log
      *
-     * @param windowsPath windows path
+     * @param path path
      * @return linux path
      */
-    public static String windowsPath2LinuxPath(String windowsPath) {
-        if (windowsPath == null) {
+    public static String backslash2Slash(String path) {
+        if (path == null) {
             return null;
         }
-        if (!windowsPath.startsWith("/")) {
-            windowsPath = "/" + windowsPath;
+        if (!path.startsWith(SLASH)) {
+            path = SLASH + path;
         }
-        return windowsPath.replace("\\", "/");
+        return path.replace("\\", SLASH);
     }
 }
