@@ -18,9 +18,6 @@ public enum ERepositoryType {
 
     private String code;
 
-    /**
-     * description
-     */
     private String description;
 
     ERepositoryType(String code, String description) {
