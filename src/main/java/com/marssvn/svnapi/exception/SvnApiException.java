@@ -1,11 +1,11 @@
 package com.marssvn.svnapi.exception;
 
 /**
- * SvnException
+ * SvnApiException
  *
  * @author zhangkx
  */
-public class SvnException extends RuntimeException {
+public class SvnApiException extends RuntimeException {
     /**
      * errorCode
      */
@@ -21,21 +21,21 @@ public class SvnException extends RuntimeException {
     }
 
     /**
-     * New com.marssvn.svnapi.exception.SvnException by message string
+     * New com.marssvn.svnapi.exception.SvnApiException by message string
      *
      * @param message message
      */
-    public SvnException(String message) {
+    public SvnApiException(String message) {
         super(message);
     }
 
     /**
-     * New com.marssvn.svnapi.exception.SvnException by errorCode and message
+     * New com.marssvn.svnapi.exception.SvnApiException by errorCode and message
      *
      * @param errorCode error code
      * @param message   message
      */
-    public SvnException(String errorCode, String message) {
+    public SvnApiException(String errorCode, String message) {
         super(message);
         this.errorCode = errorCode;
     }
