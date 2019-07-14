@@ -1,6 +1,6 @@
 package com.marssvn.svnapi.common;
 
-import com.marssvn.svnapi.exception.SvnException;
+import com.marssvn.svnapi.exception.SvnApiException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +42,11 @@ public class CommandUtils {
             if (os.startsWith(WIN)) {
                 command = "cmd /c " + command;
 
-            } else if (os.startsWith(LINUX)) {
+            } else
+            if (os.startsWith(LINUX)) {
                 command = "/bin/sh -ce " + command;
             } else {
-                throw new SvnException("Support Windows and Linux only!");
+                throw new SvnApiException("Support Windows and Linux only!");
             }
 
             logger.debug(command);
@@ -53,10 +54,10 @@ public class CommandUtils {
             process.waitFor();
             String errorMsg = IOUtils.toString(process.getErrorStream(), "UTF-8");
             if (StringUtils.isNotBlank(errorMsg)) {
-                throw new SvnException(errorMsg);
+                throw new SvnApiException(errorMsg);
             }
         } catch (IOException | InterruptedException e) {
-            throw new SvnException(e.getMessage());
+            throw new SvnApiException(e.getMessage());
         } finally {
             if (process != null) {
                 process.destroy();
