@@ -4,7 +4,7 @@ import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.DateUtils;
 import com.marssvn.svnapi.common.StringUtils;
 import com.marssvn.svnapi.enums.ESvnNodeKind;
-import com.marssvn.svnapi.exception.SvnException;
+import com.marssvn.svnapi.exception.SvnApiException;
 import com.marssvn.svnapi.model.*;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
@@ -73,10 +73,10 @@ public class SvnClientImpl implements ISvnClient {
     @Override
     public void mkdir(String dirPath, String message) {
         if (this.svnUser == null) {
-            throw new SvnException("SVN user args are required");
+            throw new SvnApiException("SVN user is required");
         }
         if (dirPath == null) {
-            throw new SvnException("Directory path can't be null");
+            throw new SvnApiException("Directory path can't be null");
         }
 
         // execute svn mkdir command
@@ -107,12 +107,12 @@ public class SvnClientImpl implements ISvnClient {
             String errorMsg = IOUtils.toString(process.getErrorStream(), "UTF-8");
             if (StringUtils.isNotBlank(errorMsg)) {
                 String[] error = errorMsg.split(": ");
-                throw new SvnException(error[1], errorMsg);
+                throw new SvnApiException(error[1], errorMsg);
             }
 
             return Long.valueOf(IOUtils.toString(process.getInputStream(), "UTF-8"));
         } catch (IOException e) {
-            throw new SvnException(e.getMessage());
+            throw new SvnApiException(e.getMessage());
         }
     }
 
@@ -157,7 +157,7 @@ public class SvnClientImpl implements ISvnClient {
                 // node kind: directory -> DIR, file -> FILE, else -> NONE
                 if ("file".equals(nodeKind)) {
                     item.setNodeKind(ESvnNodeKind.FILE);
-                } else if ("directory".equals(nodeKind)) {
+                } else if ("dir".equals(nodeKind)) {
                     item.setNodeKind(ESvnNodeKind.DIR);
                 } else {
                     item.setNodeKind(ESvnNodeKind.NONE);
@@ -232,7 +232,7 @@ public class SvnClientImpl implements ISvnClient {
 
 //            List<SvnInfoEntry> entryList = xmlSerializer.read(SvnInfo.class, infoXml).getEntryList();
 //            if (entryList.isEmpty()) {
-//                throw new SvnException("svn info entry is empty");
+//                throw new SvnApiException("svn info entry is empty");
 //            }
 //
 //            SvnInfoEntry infoEntry = entryList.get(0);
@@ -315,7 +315,7 @@ public class SvnClientImpl implements ISvnClient {
             return nodeItem;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new SvnException(e.getMessage());
+            throw new SvnApiException(e.getMessage());
         }
     }
 

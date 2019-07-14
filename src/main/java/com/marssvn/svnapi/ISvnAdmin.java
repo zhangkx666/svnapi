@@ -72,4 +72,11 @@ public interface ISvnAdmin {
     default void deleteRepository(String repoName) throws IOException {
         deleteRepository(null, repoName);
     }
+
+    /**
+     * restart svnserve
+     * @param rootPath root path
+     * @throws IOException IOException
+     */
+    void restartSvnserve(String rootPath) throws IOException;
 }
