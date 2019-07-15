@@ -16,19 +16,19 @@ import org.junit.Test;
  */
 public class SVNClientImplTest {
 
+    private final static String REPOSITORY_NAME = "marssvn";
+
     @Before
     public void before() throws Exception {
         ISvnAdmin svnAdmin = new SvnAdminForLocale();
-        String repoName = "marssvn_001";
-        svnAdmin.deleteRepository(repoName);
-        svnAdmin.createRepository(repoName);
+        svnAdmin.deleteRepository(REPOSITORY_NAME);
+        svnAdmin.createRepository(REPOSITORY_NAME);
     }
 
     @After
     public void after() throws Exception {
-        ISvnAdmin svnAdmin = new SvnAdminForLocale();
-        String repoName = "marssvn_001";
-        svnAdmin.deleteRepository(repoName);
+//        ISvnAdmin svnAdmin = new SvnAdminForLocale();
+//        svnAdmin.deleteRepository(REPOSITORY_NAME);
     }
 
     /**
@@ -38,8 +38,10 @@ public class SVNClientImplTest {
     public void testMakeDir() {
         SvnUser svnUser = new SvnUser("marssvn", "marssvn");
         ISvnClient svnClient = new SvnClient();
-        svnClient.setRootPath("svn://localhost/marssvn_001");
+        svnClient.setRootPath("svn://localhost/" + REPOSITORY_NAME);
         svnClient.setSvnUser(svnUser);
-        svnClient.mkdir("testMakeDir11/111/222/333", "test make dir");
+        svnClient.mkdir("111/222/333", "test make dir 111/222/333");
+        svnClient.mkdir("demo", "test make dir demo");
+        svnClient.mkdir("src", "test make dir src");
     }
 }
