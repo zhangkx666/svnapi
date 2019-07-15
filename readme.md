@@ -1,10 +1,12 @@
 ## about:
 svnapi is a java library to use svnadmin, svn command.
-eg. 
-svnadmin:
+
+> eg. 
+
+* svnadmin:
 svnadmin create
 
-svn:
+* svn:
 svn list
 svn info
 svn cat
