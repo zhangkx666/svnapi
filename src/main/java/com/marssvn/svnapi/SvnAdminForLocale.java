@@ -64,8 +64,8 @@ public class SvnAdminForLocale implements ISvnAdmin {
             command += " --fs-type " + repoType.getCode();
         }
 
-        CommandUtils.execute(command);
         logger.info("Create repository: " + repoName);
+        CommandUtils.execute(command);
 
         // backup svn repository settings
         backupSettings(repoPath);
@@ -90,8 +90,8 @@ public class SvnAdminForLocale implements ISvnAdmin {
         }
         File oldFolder = new File(rootPath + "/" + oldRepoName);
         File newFolder = new File(rootPath + "/" + newRepoName);
-        FileUtils.moveDirectory(oldFolder, newFolder);
         logger.info("Move repository: " + oldFolder + " -> " + newFolder);
+        FileUtils.moveDirectory(oldFolder, newFolder);
     }
 
     /**
@@ -106,8 +106,8 @@ public class SvnAdminForLocale implements ISvnAdmin {
         if (StringUtils.isBlank(rootPath)) {
             rootPath = defaultSvnRootPath;
         }
-        FileUtils.deleteDirectory(new File(rootPath + "/" + repoName));
         logger.info("Delete repository: " + repoName);
+        FileUtils.deleteDirectory(new File(rootPath + "/" + repoName));
     }
 
     /**
