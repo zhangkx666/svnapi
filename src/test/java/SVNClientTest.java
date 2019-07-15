@@ -12,10 +12,10 @@ import org.junit.runners.MethodSorters;
  *
  * @author zhangkx
  * @version 1.0
- * @since <pre>2018-10-31</pre>
+ * @since 2018-10-31
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class SVNClientImplTest {
+public class SVNClientTest {
 
     private final static String REPOSITORY_NAME = "marssvn";
 
