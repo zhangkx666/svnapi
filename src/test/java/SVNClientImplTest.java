@@ -19,16 +19,16 @@ public class SVNClientImplTest {
     @Before
     public void before() throws Exception {
         ISvnAdmin svnAdmin = new SvnAdminForLocale();
-        String repoName = "marssvn";
+        String repoName = "marssvn_001";
         svnAdmin.deleteRepository(repoName);
         svnAdmin.createRepository(repoName);
     }
 
     @After
     public void after() throws Exception {
-//        ISvnAdmin svnAdmin = new SvnAdminForLocale();
-//        String repoName = "marssvn_001";
-//        svnAdmin.deleteRepository(repoName);
+        ISvnAdmin svnAdmin = new SvnAdminForLocale();
+        String repoName = "marssvn_001";
+        svnAdmin.deleteRepository(repoName);
     }
 
     /**
@@ -38,8 +38,8 @@ public class SVNClientImplTest {
     public void testMakeDir() {
         SvnUser svnUser = new SvnUser("marssvn", "marssvn");
         ISvnClient svnClient = new SvnClientImpl();
-        svnClient.setRootPath("svn://localhost/marssvn");
+        svnClient.setRootPath("svn://localhost/marssvn_001");
         svnClient.setSvnUser(svnUser);
-        svnClient.mkdir("testMakeDir11", "test make dir");
+        svnClient.mkdir("testMakeDir11/111/222/333", "test make dir");
     }
 }

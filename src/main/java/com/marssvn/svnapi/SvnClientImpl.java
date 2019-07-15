@@ -85,6 +85,7 @@ public class SvnClientImpl implements ISvnClient {
         // execute svn mkdir command
         String path = this.rootPath + "/" + dirPath.trim();
         String command = "svn mkdir " + path + " -q -m \"" + message + "\" --parents" + this.svnUser.getAuthString();
+        logger.info("mkdir: " + dirPath);
         CommandUtils.execute(command);
     }
 
