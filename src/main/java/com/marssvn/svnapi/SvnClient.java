@@ -25,12 +25,12 @@ import java.util.List;
  * @author zhangkx
  */
 @Component
-public class SvnClientImpl implements ISvnClient {
+public class SvnClient implements ISvnClient {
 
     /**
      * slf4j.Logger
      */
-    private Logger logger = LoggerFactory.getLogger(SvnClientImpl.class);
+    private Logger logger = LoggerFactory.getLogger(SvnClient.class);
 
     private SvnRepository repository;
 
