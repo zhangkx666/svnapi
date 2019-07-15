@@ -2,7 +2,7 @@ package com.marssvn.svnapi;
 
 import com.marssvn.svnapi.model.SVNLock;
 import com.marssvn.svnapi.model.SVNNodeItem;
-import com.marssvn.svnapi.model.SVNUser;
+import com.marssvn.svnapi.model.SvnUser;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public interface ISvnClient {
      * set svn user
      * @param svnUser svn user
      */
-    void setSvnUser(SVNUser svnUser);
+    void setSvnUser(SvnUser svnUser);
 
     /**
      * make directory, will make parent directories also

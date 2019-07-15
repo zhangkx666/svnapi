@@ -3,6 +3,7 @@ package com.marssvn.svnapi;
 import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.StringUtils;
 import com.marssvn.svnapi.enums.ERepositoryType;
+import com.marssvn.svnapi.exception.SvnApiException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,15 @@ public class SvnAdminForLocale implements ISvnAdmin {
     private Logger logger = LoggerFactory.getLogger(SvnAdminForLocale.class);
 
     /**
+     * default svn root path
+     */
+    private static String defaultSvnRootPath;
+
+    static {
+        defaultSvnRootPath = System.getProperty("user.home") + "/svn";
+    }
+
+    /**
      * createRepository a new repository
      *
      * @param rootPath root path, use user.home if null
@@ -37,7 +47,7 @@ public class SvnAdminForLocale implements ISvnAdmin {
 
         // svn root path, here we use use home path
         if (StringUtils.isBlank(rootPath)) {
-            rootPath = System.getProperty("user.home") + "/svn";
+            rootPath = defaultSvnRootPath;
         }
 
         // if repository root path not exists, mkdir
@@ -55,6 +65,7 @@ public class SvnAdminForLocale implements ISvnAdmin {
         }
 
         CommandUtils.execute(command);
+        logger.info("Create repository: " + repoName);
 
         // backup svn repository settings
         backupSettings(repoPath);
@@ -75,11 +86,12 @@ public class SvnAdminForLocale implements ISvnAdmin {
     @Override
     public void moveRepository(String rootPath, String oldRepoName, String newRepoName) throws IOException {
         if (StringUtils.isBlank(rootPath)) {
-            rootPath = System.getProperty("user.home") + "/svn";
+            rootPath = defaultSvnRootPath;
         }
         File oldFolder = new File(rootPath + "/" + oldRepoName);
         File newFolder = new File(rootPath + "/" + newRepoName);
         FileUtils.moveDirectory(oldFolder, newFolder);
+        logger.info("Move repository: " + oldFolder + " -> " + newFolder);
     }
 
     /**
@@ -92,9 +104,10 @@ public class SvnAdminForLocale implements ISvnAdmin {
     @Override
     public void deleteRepository(String rootPath, String repoName) throws IOException {
         if (StringUtils.isBlank(rootPath)) {
-            rootPath = System.getProperty("user.home") + "/svn";
+            rootPath = defaultSvnRootPath;
         }
         FileUtils.deleteDirectory(new File(rootPath + "/" + repoName));
+        logger.info("Delete repository: " + repoName);
     }
 
     /**
@@ -147,18 +160,22 @@ public class SvnAdminForLocale implements ISvnAdmin {
 
     /**
      * restart svnserve
+     *
      * @param rootPath root path
-     * @throws IOException IOException
      */
     @Override
-    public void restartSvnserve(String rootPath) throws IOException {
+    public void restartSvnserve(String rootPath) {
 
         // stop svnserve process
         CommandUtils.stopProcess("svnserve");
 
         if (StringUtils.isBlank(rootPath)) {
-            rootPath = System.getProperty("user.home") + "/svn";
+            rootPath = defaultSvnRootPath;
         }
-        CommandUtils.execute("svnserve -d -r " + rootPath);
+        if (CommandUtils.osIsLinux()) {
+            CommandUtils.execute("svnserve -d -r " + rootPath);
+        } else if (CommandUtils.osIsWindows()) {
+            throw new SvnApiException("EA0001", "Please restart the svnserve service manually on Windows.");
+        }
     }
 }

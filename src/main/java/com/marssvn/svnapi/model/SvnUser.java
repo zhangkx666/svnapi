@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * svn user
  *
+ * @author zhangkx
  */
 @Getter
 @Setter
-public class SVNUser {
+public class SvnUser {
 
     /**
      * user name
@@ -20,13 +22,12 @@ public class SVNUser {
      */
     private String password;
 
-    public SVNUser(String username, String password) {
+    public SvnUser(String username, String password) {
         this.username = username;
         this.password = password;
     }
 
     public String getAuthString() {
-        return " --username " + this.getUsername() + " --password " + this.getPassword() +
-                " --no-auth-cache --non-interactive";
+        return " --username " + this.getUsername() + " --password " + this.getPassword() + " --no-auth-cache --non-interactive";
     }
 }

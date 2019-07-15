@@ -19,9 +19,8 @@ public class BaseBean implements Serializable {
             BeanUtils.copyProperties(this, destObject);
             return destObject;
         } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     /**

@@ -1,35 +1,45 @@
-//import com.marssvn.svnapi.ISvnClient;
-//import com.marssvn.svnapi.SVNClientImpl;
-//import com.marssvn.svnapi.model.SVNUser;
-//import org.junit.After;
-//import org.junit.Before;
-//import org.junit.Test;
-//
-///**
-// * SVNClientImpl Tester.
-// *
-// * @author zhangkx
-// * @version 1.0
-// * @since <pre>2018-10-31</pre>
-// */
-//public class SVNClientImplTest {
-//
-//    @Before
-//    public void before() throws Exception {
-//    }
-//
-//    @After
-//    public void after() throws Exception {
-//    }
-//
-//    /**
-//     * Method: mkdir(String dirPath, String message)`
-//     */
-//    @Test
-//    public void testMakeDir() throws Exception {
-//        SVNUser svnUser = new SVNUser("zhangkx", "123456");
-//        ISvnClient svnClient = new SVNClientImpl("svn://127.0.0.1/marssvn", svnUser);
-//
-//        svnClient.mkdir("testMakeDir11", "test make dir");
-//    }
-//}
+import com.marssvn.svnapi.ISvnAdmin;
+import com.marssvn.svnapi.ISvnClient;
+import com.marssvn.svnapi.SvnAdminForLocale;
+import com.marssvn.svnapi.SvnClientImpl;
+import com.marssvn.svnapi.model.SvnUser;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * SVNClientImpl Tester.
+ *
+ * @author zhangkx
+ * @version 1.0
+ * @since <pre>2018-10-31</pre>
+ */
+public class SVNClientImplTest {
+
+    @Before
+    public void before() throws Exception {
+        ISvnAdmin svnAdmin = new SvnAdminForLocale();
+        String repoName = "marssvn";
+        svnAdmin.deleteRepository(repoName);
+        svnAdmin.createRepository(repoName);
+    }
+
+    @After
+    public void after() throws Exception {
+//        ISvnAdmin svnAdmin = new SvnAdminForLocale();
+//        String repoName = "marssvn_001";
+//        svnAdmin.deleteRepository(repoName);
+    }
+
+    /**
+     * Method: mkdir(String dirPath, String message)`
+     */
+    @Test
+    public void testMakeDir() {
+        SvnUser svnUser = new SvnUser("marssvn", "marssvn");
+        ISvnClient svnClient = new SvnClientImpl();
+        svnClient.setRootPath("svn://localhost/marssvn");
+        svnClient.setSvnUser(svnUser);
+        svnClient.mkdir("testMakeDir11", "test make dir");
+    }
+}

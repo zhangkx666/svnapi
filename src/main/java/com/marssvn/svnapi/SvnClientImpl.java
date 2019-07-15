@@ -42,7 +42,7 @@ public class SvnClientImpl implements ISvnClient {
     /**
      * svn user info
      */
-    private SVNUser svnUser;
+    private SvnUser svnUser;
 
     /**
      * set root path
@@ -60,7 +60,7 @@ public class SvnClientImpl implements ISvnClient {
      * @param svnUser svn user
      */
     @Override
-    public void setSvnUser(SVNUser svnUser) {
+    public void setSvnUser(SvnUser svnUser) {
         this.svnUser = svnUser;
     }
 
@@ -73,10 +73,13 @@ public class SvnClientImpl implements ISvnClient {
     @Override
     public void mkdir(String dirPath, String message) {
         if (this.svnUser == null) {
-            throw new SvnApiException("SVN user is required");
+            throw new SvnApiException("EC0001","SVN user is required");
         }
-        if (dirPath == null) {
-            throw new SvnApiException("Directory path can't be null");
+        if (StringUtils.isBlank(this.rootPath)) {
+            throw new SvnApiException("EC0002","SVN root path is required");
+        }
+        if (StringUtils.isBlank(dirPath)) {
+            throw new SvnApiException("EC0003","Directory path is required");
         }
 
         // execute svn mkdir command
