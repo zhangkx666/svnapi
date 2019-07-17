@@ -28,8 +28,8 @@ public class SVNClientTest {
 
     @AfterClass
     public static void after() throws Exception {
-//        ISvnAdmin svnAdmin = new SvnAdminForLocale();
-//        svnAdmin.deleteRepository(REPOSITORY_NAME);
+        ISvnAdmin svnAdmin = new SvnAdminForLocale();
+        svnAdmin.deleteRepository(REPOSITORY_NAME);
     }
 
     /**
@@ -65,5 +65,25 @@ public class SVNClientTest {
         ISvnClient svnClient = new SvnClient();
         svnClient.setSvnUser(svnUser);
         svnClient.mkdir("demo3", "test make dir demo");
+    }
+
+    @Test
+    public void test04_HeadRevision() {
+        SvnUser svnUser = new SvnUser("marssvn", "marssvn");
+        ISvnClient svnClient = new SvnClient();
+        svnClient.setRootPath("svn://localhost/" + REPOSITORY_NAME);
+        svnClient.setSvnUser(svnUser);
+        long headRevision = svnClient.headRevision("demo");
+        Assert.assertEquals(3, headRevision);
+    }
+
+    @Test
+    public void test05_LastChangedRevision() {
+        SvnUser svnUser = new SvnUser("marssvn", "marssvn");
+        ISvnClient svnClient = new SvnClient();
+        svnClient.setRootPath("svn://localhost/" + REPOSITORY_NAME);
+        svnClient.setSvnUser(svnUser);
+        long headRevision = svnClient.lastChangedRevision("demo");
+        Assert.assertEquals(2, headRevision);
     }
 }

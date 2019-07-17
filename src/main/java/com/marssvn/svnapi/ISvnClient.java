@@ -42,6 +42,13 @@ public interface ISvnClient {
     long headRevision(String path);
 
     /**
+     * get last changed revision
+     * @param path path
+     * @return last changed revision
+     */
+    public long lastChangedRevision(String path);
+
+    /**
      * get file mime type
      *
      * @param filePath file path

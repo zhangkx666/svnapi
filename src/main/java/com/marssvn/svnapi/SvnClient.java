@@ -5,12 +5,14 @@ import com.marssvn.svnapi.common.DateUtils;
 import com.marssvn.svnapi.common.StringUtils;
 import com.marssvn.svnapi.enums.ESvnNodeKind;
 import com.marssvn.svnapi.exception.SvnApiException;
-import com.marssvn.svnapi.model.*;
+import com.marssvn.svnapi.model.SVNCommit;
+import com.marssvn.svnapi.model.SVNLock;
+import com.marssvn.svnapi.model.SVNNodeItem;
+import com.marssvn.svnapi.model.SvnUser;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -31,8 +33,6 @@ public class SvnClient implements ISvnClient {
      * slf4j.Logger
      */
     private Logger logger = LoggerFactory.getLogger(SvnClient.class);
-
-    private SvnRepository repository;
 
     /**
      * root path
@@ -67,26 +67,43 @@ public class SvnClient implements ISvnClient {
     /**
      * make directory, will make parent directories also
      *
-     * @param dirPath directory path
+     * @param path    directory path
      * @param message commit message
      */
     @Override
-    public void mkdir(String dirPath, String message) {
+    public void mkdir(String path, String message) {
+        // execute svn mkdir command
+        String fullPath = this.getFullPath(path);
+        String command = "svn mkdir " + fullPath + " -q -m \"" + message + "\" --parents" + this.svnUser.getAuthString();
+        logger.info("mkdir: " + fullPath);
+        CommandUtils.execute(command);
+    }
+
+    /**
+     * do base check
+     * throw SvnApiException when svnUser or rootPath is null
+     */
+    private void doBaseCheck(String path) {
         if (this.svnUser == null) {
-            throw new SvnApiException("EC0001","SVN user is required");
+            throw new SvnApiException("EC0001", "SVN user is required");
         }
         if (StringUtils.isBlank(this.rootPath)) {
-            throw new SvnApiException("EC0002","SVN root path is required");
+            throw new SvnApiException("EC0002", "SVN root path is required");
         }
-        if (StringUtils.isBlank(dirPath)) {
-            throw new SvnApiException("EC0003","Directory path is required");
+        if (StringUtils.isBlank(path)) {
+            throw new SvnApiException("EC0003", "Path is required");
         }
+    }
 
-        // execute svn mkdir command
-        String path = this.rootPath + "/" + dirPath.trim();
-        String command = "svn mkdir " + path + " -q -m \"" + message + "\" --parents" + this.svnUser.getAuthString();
-        logger.info("mkdir: " + dirPath);
-        CommandUtils.execute(command);
+    /**
+     * get full path
+     *
+     * @param path relative path
+     * @return full path
+     */
+    private String getFullPath(String path) {
+        doBaseCheck(path);
+        return this.rootPath + "/" + path;
     }
 
     /**
@@ -98,49 +115,50 @@ public class SvnClient implements ISvnClient {
     @Override
     public long headRevision(String path) {
         try {
-            path = this.rootPath + "/" + (path == null ? "" : path.trim());
-            String command = "svn info " + path + " --show-item revision --no-newline" + this.svnUser.getAuthString();
-
-            // print debug log
-            logger.debug("execute command: " + command);
-
-            // execute svn info command
-            Process process = Runtime.getRuntime().exec(command);
-
-            // check error
-            String errorMsg = IOUtils.toString(process.getErrorStream(), "UTF-8");
-            if (StringUtils.isNotBlank(errorMsg)) {
-                String[] error = errorMsg.split(": ");
-                throw new SvnApiException(error[1], errorMsg);
-            }
-
-            return Long.valueOf(IOUtils.toString(process.getInputStream(), "UTF-8"));
+            String command = "svn info " + getFullPath(path) + " --show-item revision --no-newline";
+            return CommandUtils.executeForLong(svnUser, command);
         } catch (IOException e) {
             throw new SvnApiException(e.getMessage());
         }
     }
 
     /**
-     * get file list
+     * get last changed revision
+     *
+     * @param path path
+     * @return last changed revision
+     */
+    @Override
+    public long lastChangedRevision(String path) {
+        try {
+            String command = "svn info " + getFullPath(path) + " --show-item last-changed-revision --no-newline";
+            return CommandUtils.executeForLong(svnUser, command);
+        } catch (IOException e) {
+            throw new SvnApiException(e.getMessage());
+        }
+    }
+
+    /**
+     * get the document list of path
+     * svn command: svn list
+     *
      * @param path
      * @param revision
      * @return
      */
-    public SVNNodeItem getList(String path, long revision) {
+    public SVNNodeItem list(String path, long revision) {
 
         // file revision
         String rev = revision == -1 ? "HEAD" : String.valueOf(revision);
 
         // file full path
-        String fullPath = this.repository.getRootPath() + "/" + path;
+        String fullPath = getFullPath(path);
 
         // command
         String command = "svn list " + fullPath + " --xml -r " + rev + this.svnUser.getAuthString();
         try {
-            Process process = Runtime.getRuntime().exec(command);
 
-            SAXReader xmlReader = new SAXReader();
-            Document document = xmlReader.read(process.getInputStream());
+            Document document = CommandUtils.executeForXmlDocument(svnUser, command);
             Element rootElement = document.getRootElement().element("list");
 
             SVNNodeItem directory = new SVNNodeItem();
@@ -222,7 +240,7 @@ public class SvnClient implements ISvnClient {
             String rev = revision == -1 ? "HEAD" : String.valueOf(revision);
 
             // file full path
-            String fullPath = this.repository.getRootPath() + "/" + path;
+            String fullPath = getFullPath(path);
 
             // command
             String command = "svn info " + fullPath + " --xml -r " + rev + this.svnUser.getAuthString();
