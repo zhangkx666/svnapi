@@ -115,7 +115,7 @@ public class SvnClient implements ISvnClient {
     }
 
     /**
-     * get head revision by path
+     * get head revision
      *
      * @return head revision
      */
