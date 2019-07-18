@@ -1,7 +1,7 @@
 package com.marssvn.svnapi;
 
-import com.marssvn.svnapi.model.SVNLock;
-import com.marssvn.svnapi.model.SVNNodeItem;
+import com.marssvn.svnapi.model.SvnLock;
+import com.marssvn.svnapi.model.SvnEntry;
 import com.marssvn.svnapi.model.SvnUser;
 
 import java.util.List;
@@ -78,7 +78,7 @@ public interface ISvnClient {
      * @param path directory path
      * @return list
      */
-    List<SVNNodeItem> list(String path);
+    List<SvnEntry> list(String path);
 
     /**
      * lock the file of path, if path is a directory, lock all of it's children file
@@ -103,9 +103,9 @@ public interface ISvnClient {
      * get lock info of path
      *
      * @param filePath file path
-     * @return SVNLock
+     * @return SvnLock
      */
-    SVNLock getLock(String filePath);
+    SvnLock getLock(String filePath);
 
     /**
      * get file content of text file

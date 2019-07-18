@@ -7,25 +7,25 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class SVNLock extends BaseBean {
+public class SvnLock extends BaseBean {
 
     /**
-     * SVNLock token
+     * SvnLock token
      */
     private String token;
 
     /**
-     * SVNLock owner
+     * SvnLock owner
      */
     private String owner;
 
     /**
-     * SVNLock comment
+     * SvnLock comment
      */
     private String comment;
 
     /**
-     * SVNLock created at
+     * SvnLock created at
      */
     private Date createdAt;
 }

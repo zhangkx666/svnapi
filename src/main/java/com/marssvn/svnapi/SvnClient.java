@@ -3,11 +3,9 @@ package com.marssvn.svnapi;
 import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.DateUtils;
 import com.marssvn.svnapi.common.StringUtils;
-import com.marssvn.svnapi.enums.ESvnNodeKind;
 import com.marssvn.svnapi.exception.SvnApiException;
-import com.marssvn.svnapi.model.SVNCommit;
-import com.marssvn.svnapi.model.SVNLock;
-import com.marssvn.svnapi.model.SVNNodeItem;
+import com.marssvn.svnapi.model.SvnEntry;
+import com.marssvn.svnapi.model.SvnLock;
 import com.marssvn.svnapi.model.SvnUser;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
@@ -73,10 +71,10 @@ public class SvnClient implements ISvnClient {
     @Override
     public void mkdir(String path, String message) {
         // execute svn mkdir command
-        String fullPath = this.getFullPath(path);
-        String command = "svn mkdir " + fullPath + " -q -m \"" + message + "\" --parents" + this.svnUser.getAuthString();
+        String fullPath = getFullPath(path);
+        String command = "svn mkdir " + fullPath + " -q -m \"" + message + "\" --parents";
+        CommandUtils.execute(svnUser, command);
         logger.info("mkdir: " + fullPath);
-        CommandUtils.execute(command);
     }
 
     /**
@@ -146,7 +144,7 @@ public class SvnClient implements ISvnClient {
      * @param revision
      * @return
      */
-    public SVNNodeItem list(String path, long revision) {
+    public List<SvnEntry> list(String path, long revision) {
 
         // file revision
         String rev = revision == -1 ? "HEAD" : String.valueOf(revision);
@@ -155,36 +153,18 @@ public class SvnClient implements ISvnClient {
         String fullPath = getFullPath(path);
 
         // command
-        String command = "svn list " + fullPath + " --xml -r " + rev + this.svnUser.getAuthString();
+        String command = "svn list " + fullPath + " --xml -r " + rev;
         try {
 
             Document document = CommandUtils.executeForXmlDocument(svnUser, command);
             Element rootElement = document.getRootElement().element("list");
 
-            SVNNodeItem directory = new SVNNodeItem();
-
-            // path
-            directory.setPath(path);
-
-            // parent path
-            // TODO
-            directory.setParentPath("");
-
             // <list><entry></entry></list>
-            List<SVNNodeItem> children = new ArrayList<>();
+            List<SvnEntry> list = new ArrayList<>();
             rootElement.elements().forEach(entry -> {
-                SVNNodeItem item = new SVNNodeItem();
+                SvnEntry item = new SvnEntry();
                 String nodeKind = entry.attributeValue("kind");
-
-                // node kind: directory -> DIR, file -> FILE, else -> NONE
-                if ("file".equals(nodeKind)) {
-                    item.setNodeKind(ESvnNodeKind.FILE);
-                } else if ("dir".equals(nodeKind)) {
-                    item.setNodeKind(ESvnNodeKind.DIR);
-                } else {
-                    item.setNodeKind(ESvnNodeKind.NONE);
-                }
-
+                item.setKind(nodeKind);
                 item.setName(entry.elementText("name"));
                 item.setPath(path + "/" + item.getName());
                 // TODO
@@ -194,18 +174,14 @@ public class SvnClient implements ISvnClient {
 
                 // svn commit info
                 Element commitElement = entry.element("commit");
-                if (commitElement.hasContent()) {
-                    SVNCommit svnCommit = new SVNCommit();
-                    svnCommit.setRevision(Long.valueOf(commitElement.attributeValue("revision")));
-                    svnCommit.setAuthor(commitElement.elementText("author"));
-                    svnCommit.setDate(DateUtils.parseDate(commitElement.elementText("date")));
-                    item.setCommit(svnCommit);
-                }
+                item.setRevision(Long.valueOf(commitElement.attributeValue("revision")));
+                item.setAuthor(commitElement.elementText("author"));
+                item.setUpdatedAt(DateUtils.parseDate(commitElement.elementText("date")));
 
                 // svn lock
                 Element lockElement = entry.element("lock");
                 if (lockElement.hasContent()) {
-                    SVNLock svnLock = new SVNLock();
+                    SvnLock svnLock = new SvnLock();
                     svnLock.setToken(lockElement.elementText("token"));
                     svnLock.setOwner(lockElement.elementText("owner"));
                     svnLock.setComment(lockElement.elementText("comment"));
@@ -213,12 +189,10 @@ public class SvnClient implements ISvnClient {
                     item.setLock(svnLock);
                 }
 
-                children.add(item);
+                list.add(item);
             });
 
-            directory.setChildren(children);
-
-            return null;
+            return list;
         } catch (IOException | DocumentException e) {
             e.printStackTrace();
         }
@@ -231,9 +205,9 @@ public class SvnClient implements ISvnClient {
      *
      * @param path     file path
      * @param revision file revision
-     * @return SVNNodeItem
+     * @return SvnEntry
      */
-    public SVNNodeItem getFile(String path, long revision) {
+    public SvnEntry getFile(String path, long revision) {
         try {
 
             // file revision
@@ -246,7 +220,7 @@ public class SvnClient implements ISvnClient {
             String command = "svn info " + fullPath + " --xml -r " + rev + this.svnUser.getAuthString();
             Process process = Runtime.getRuntime().exec(command);
 
-            // serialize xml to SVNNodeItem
+            // serialize xml to SvnEntry
 //            Serializer xmlSerializer = new Persister();
 
             String infoXml = IOUtils.toString(process.getInputStream(), "UTF-8");
@@ -259,7 +233,7 @@ public class SvnClient implements ISvnClient {
 //
 //            SvnInfoEntry infoEntry = entryList.get(0);
 //
-            SVNNodeItem nodeItem = new SVNNodeItem();
+            SvnEntry nodeItem = new SvnEntry();
 //
 //            // FileIcon.vue
 //            String nodeItemName = infoEntry.getPath();
@@ -306,7 +280,7 @@ public class SvnClient implements ISvnClient {
 //            if (infoLock != null) {
 //
 //                // token, owner, comment
-//                SVNLock svnLock = infoLock.convertTo(SVNLock.class);
+//                SvnLock svnLock = infoLock.convertTo(SvnLock.class);
 //
 //                // lock createdAt
 //                svnLock.setCreatedAt(DateUtils.parseDate(infoLock.getCreated()));
@@ -317,7 +291,7 @@ public class SvnClient implements ISvnClient {
 //            SvnInfoCommit infoCommit = infoEntry.getCommit();
 //            if (infoCommit != null) {
 //                long commitRevision = infoCommit.getRevision();
-//                SVNCommit commit = new SVNCommit();
+//                SvnCommit commit = new SvnCommit();
 //
 //                // last changed revision
 //                commit.setRevision(commitRevision);
@@ -376,7 +350,7 @@ public class SvnClient implements ISvnClient {
      * @return list
      */
     @Override
-    public List<SVNNodeItem> list(String path) {
+    public List<SvnEntry> list(String path) {
         return null;
     }
 
@@ -409,10 +383,10 @@ public class SvnClient implements ISvnClient {
      * get lock info of path
      *
      * @param filePath file path
-     * @return SVNLock
+     * @return SvnLock
      */
     @Override
-    public SVNLock getLock(String filePath) {
+    public SvnLock getLock(String filePath) {
         return null;
     }
 

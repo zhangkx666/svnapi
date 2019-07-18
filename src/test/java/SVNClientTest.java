@@ -28,8 +28,8 @@ public class SVNClientTest {
 
     @AfterClass
     public static void after() throws Exception {
-        ISvnAdmin svnAdmin = new SvnAdminForLocale();
-        svnAdmin.deleteRepository(REPOSITORY_NAME);
+//        ISvnAdmin svnAdmin = new SvnAdminForLocale();
+//        svnAdmin.deleteRepository(REPOSITORY_NAME);
     }
 
     /**
