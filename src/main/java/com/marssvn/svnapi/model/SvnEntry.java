@@ -73,12 +73,19 @@ public class SvnEntry extends BaseBean {
     private String mimeType;
 
     /**
-     * last changed
-     */
-    private SvnCommit commit;
-
-    /**
      * lockOwner
      */
     private SvnLock lock;
+
+//    /**
+//     * get extension
+//     *
+//     * @return extension. eg. xls, pdf, jpg
+//     */
+//    public String getExtension() {
+//        if (StringUtils.isBlank(this.name)) {
+//            return "";
+//        }
+//        return this.name.substring(this.name.lastIndexOf(".") + 1);
+//    }
 }

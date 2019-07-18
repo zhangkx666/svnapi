@@ -105,15 +105,24 @@ public class SvnClient implements ISvnClient {
     }
 
     /**
+     * get root path
+     *
+     * @return root path
+     */
+    private String getRootPath() {
+        doBaseCheck(this.rootPath);
+        return this.rootPath;
+    }
+
+    /**
      * get head revision by path
      *
-     * @param path path
      * @return head revision
      */
     @Override
-    public long headRevision(String path) {
+    public long headRevision() {
         try {
-            String command = "svn info " + getFullPath(path) + " --show-item revision --no-newline";
+            String command = "svn info " + getRootPath() + " --show-item revision --no-newline";
             return CommandUtils.executeForLong(svnUser, command);
         } catch (IOException e) {
             throw new SvnApiException(e.getMessage());
@@ -140,21 +149,23 @@ public class SvnClient implements ISvnClient {
      * get the document list of path
      * svn command: svn list
      *
-     * @param path
-     * @param revision
-     * @return
+     * @param path     relative path
+     * @param revision revision
+     * @return entry list
      */
     public List<SvnEntry> list(String path, long revision) {
-
-        // file revision
-        String rev = revision == -1 ? "HEAD" : String.valueOf(revision);
-
-        // file full path
-        String fullPath = getFullPath(path);
-
-        // command
-        String command = "svn list " + fullPath + " --xml -r " + rev;
         try {
+            // get head revision
+            long headRevision = headRevision();
+
+            // file revision
+            String rev = revision == -1 ? "HEAD" : String.valueOf(revision);
+
+            // full path
+            String parentFullPath = getFullPath(path);
+
+            // command
+            String command = "svn list " + parentFullPath + " --xml -r " + rev;
 
             Document document = CommandUtils.executeForXmlDocument(svnUser, command);
             Element rootElement = document.getRootElement().element("list");
@@ -162,21 +173,20 @@ public class SvnClient implements ISvnClient {
             // <list><entry></entry></list>
             List<SvnEntry> list = new ArrayList<>();
             rootElement.elements().forEach(entry -> {
-                SvnEntry item = new SvnEntry();
-                String nodeKind = entry.attributeValue("kind");
-                item.setKind(nodeKind);
-                item.setName(entry.elementText("name"));
-                item.setPath(path + "/" + item.getName());
-                // TODO
-                item.setExtension("");
-                item.setMimeType("");
-                item.setSize(Long.valueOf(entry.elementText("size")));
-
-                // svn commit info
+                SvnEntry svnEntry = new SvnEntry();
+                svnEntry.setKind(entry.attributeValue("kind"));
+                String entryName = entry.elementText("name");
+                svnEntry.setName(entryName);
+                svnEntry.setParentPath(parentFullPath);
+                svnEntry.setPath(path + "/" + entryName);
+                svnEntry.setUrl(parentFullPath + "/" + entryName);
+                svnEntry.setSize(Long.valueOf(entry.elementText("size")));
+                svnEntry.setExtension(entryName.substring(entryName.lastIndexOf(".") + 1));
                 Element commitElement = entry.element("commit");
-                item.setRevision(Long.valueOf(commitElement.attributeValue("revision")));
-                item.setAuthor(commitElement.elementText("author"));
-                item.setUpdatedAt(DateUtils.parseDate(commitElement.elementText("date")));
+                svnEntry.setRevision(headRevision);
+                svnEntry.setLastChangedRevision(Long.valueOf(commitElement.attributeValue("revision")));
+                svnEntry.setAuthor(commitElement.elementText("author"));
+                svnEntry.setUpdatedAt(DateUtils.parseDate(commitElement.elementText("date")));
 
                 // svn lock
                 Element lockElement = entry.element("lock");
@@ -186,18 +196,15 @@ public class SvnClient implements ISvnClient {
                     svnLock.setOwner(lockElement.elementText("owner"));
                     svnLock.setComment(lockElement.elementText("comment"));
                     svnLock.setCreatedAt(DateUtils.parseDate(lockElement.elementText("created")));
-                    item.setLock(svnLock);
+                    svnEntry.setLock(svnLock);
                 }
-
-                list.add(item);
+                list.add(svnEntry);
             });
-
             return list;
         } catch (IOException | DocumentException e) {
             e.printStackTrace();
         }
-
-        return null;
+        return new ArrayList<>();
     }
 
     /**

@@ -36,10 +36,9 @@ public interface ISvnClient {
     /**
      * get head revision of path
      *
-     * @param path path
      * @return head revision
      */
-    long headRevision(String path);
+    long headRevision();
 
     /**
      * get last changed revision
