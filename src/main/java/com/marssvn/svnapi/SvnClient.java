@@ -3,6 +3,7 @@ package com.marssvn.svnapi;
 import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.DateUtils;
 import com.marssvn.svnapi.common.StringUtils;
+import com.marssvn.svnapi.enums.ESvnNodeKind;
 import com.marssvn.svnapi.exception.SvnApiException;
 import com.marssvn.svnapi.model.SvnEntry;
 import com.marssvn.svnapi.model.SvnLock;
@@ -153,6 +154,7 @@ public class SvnClient implements ISvnClient {
      * @param revision revision
      * @return entry list
      */
+    @Override
     public List<SvnEntry> list(String path, long revision) {
         try {
             // get head revision
@@ -162,7 +164,7 @@ public class SvnClient implements ISvnClient {
             String rev = revision == -1 ? "HEAD" : String.valueOf(revision);
 
             // full path
-            String parentFullPath = getFullPath(path);
+            String parentFullPath = StringUtils.isBlank(path) ? this.rootPath : getFullPath(path);
 
             // command
             String command = "svn list " + parentFullPath + " --xml -r " + rev;
@@ -178,19 +180,26 @@ public class SvnClient implements ISvnClient {
                 String entryName = entry.elementText("name");
                 svnEntry.setName(entryName);
                 svnEntry.setParentPath(parentFullPath);
-                svnEntry.setPath(path + "/" + entryName);
-                svnEntry.setUrl(parentFullPath + "/" + entryName);
-                svnEntry.setSize(Long.valueOf(entry.elementText("size")));
-                svnEntry.setExtension(entryName.substring(entryName.lastIndexOf(".") + 1));
+                if (StringUtils.isBlank(path)) {
+                    svnEntry.setPath(entryName);
+                } else {
+                    svnEntry.setPath(path + "/" + entryName);
+                }
+                svnEntry.setFullPath(parentFullPath + "/" + entryName);
                 Element commitElement = entry.element("commit");
                 svnEntry.setRevision(headRevision);
-                svnEntry.setLastChangedRevision(Long.valueOf(commitElement.attributeValue("revision")));
-                svnEntry.setAuthor(commitElement.elementText("author"));
-                svnEntry.setUpdatedAt(DateUtils.parseDate(commitElement.elementText("date")));
+                svnEntry.setCommitRevision(Long.valueOf(commitElement.attributeValue("revision")));
+                svnEntry.setCommitAuthor(commitElement.elementText("commitAuthor"));
+                svnEntry.setCommitDate(DateUtils.parseDate(commitElement.elementText("date")));
+
+                if (ESvnNodeKind.FILE.equalsValue(svnEntry.getKind())) {
+                    svnEntry.setSize(Long.valueOf(entry.elementText("size")));
+                    svnEntry.setExtension(entryName.substring(entryName.lastIndexOf(".") + 1));
+                }
 
                 // svn lock
                 Element lockElement = entry.element("lock");
-                if (lockElement.hasContent()) {
+                if (lockElement != null && lockElement.hasContent()) {
                     SvnLock svnLock = new SvnLock();
                     svnLock.setToken(lockElement.elementText("token"));
                     svnLock.setOwner(lockElement.elementText("owner"));
@@ -303,8 +312,8 @@ public class SvnClient implements ISvnClient {
 //                // last changed revision
 //                commit.setRevision(commitRevision);
 //
-//                // last changed author
-//                commit.setAuthor(infoCommit.getAuthor());
+//                // last changed commitAuthor
+//                commit.setCommitAuthor(infoCommit.getCommitAuthor());
 //
 //                // last changed date
 //                commit.setDate(DateUtils.parseDate(infoCommit.getDate()));
@@ -347,17 +356,6 @@ public class SvnClient implements ISvnClient {
      */
     @Override
     public String blame(String filePath, long revision) {
-        return null;
-    }
-
-    /**
-     * list directories and files of path
-     *
-     * @param path directory path
-     * @return list
-     */
-    @Override
-    public List<SvnEntry> list(String path) {
         return null;
     }
 

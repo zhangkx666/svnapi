@@ -10,15 +10,20 @@ public enum ESvnNodeKind {
     /**
      * directory
      */
-    DIR,
+    DIR("dir"),
 
     /**
      * file
      */
-    FILE,
+    FILE("file");
 
-    /**
-     * none
-     */
-    NONE
+    private String value;
+
+    ESvnNodeKind(String value) {
+        this.value = value;
+    }
+
+    public boolean equalsValue(String kind) {
+        return this.value.equals(kind);
+    }
 }

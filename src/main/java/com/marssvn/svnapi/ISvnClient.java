@@ -77,7 +77,19 @@ public interface ISvnClient {
      * @param path directory path
      * @return list
      */
-    List<SvnEntry> list(String path);
+    default List<SvnEntry> list(String path) {
+        return list(path, -1);
+    }
+
+    /**
+     * get the document list of path
+     * svn command: svn list
+     *
+     * @param path     relative path
+     * @param revision revision
+     * @return entry list
+     */
+    List<SvnEntry> list(String path, long revision);
 
     /**
      * lock the file of path, if path is a directory, lock all of it's children file

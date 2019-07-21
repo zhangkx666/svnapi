@@ -33,9 +33,9 @@ public class SvnEntry extends BaseBean {
     private String parentPath;
 
     /**
-     * file url(full path)
+     * file fullPath(full path)
      */
-    private String url;
+    private String fullPath;
 
     /**
      * revision (head revision)
@@ -43,19 +43,24 @@ public class SvnEntry extends BaseBean {
     private long revision;
 
     /**
-     * last changed revision
+     * commit revision (last changed)
      */
-    private long lastChangedRevision;
+    private long commitRevision;
 
     /**
-     * commit author
+     * commit commitAuthor
      */
-    private String author;
+    private String commitAuthor;
 
     /**
      * updated date (committed at)
      */
-    private Date updatedAt;
+    private Date commitDate;
+
+    /**
+     * commit message
+     */
+    private String commitMessage;
 
     /**
      * file size
