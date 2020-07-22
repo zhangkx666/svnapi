@@ -1,14 +1,20 @@
 package com.marssvn.svnapi.common;
 
+import java.io.File;
+
 /**
  * String utils
+ *
  * @author zhangkx
  */
 public class StringUtils {
 
     public final static String SLASH = "/";
 
-   /**
+    public static final char SLASH_CHAR = '/';
+    public static final char BACKSLASH_CHAR = '\\';
+
+    /**
      * check if the str is empty
      *
      * @param str string
@@ -49,19 +55,18 @@ public class StringUtils {
     }
 
     /**
-     * convert backslash to Slash
-     * eg. C:\windows\log to /C:/windows/log
+     * Fixes the file separator char for the target platform
+     * using the following replacement.
      *
-     * @param path path
-     * @return linux path
+     * <ul>
+     * <li>'/' &#x2192; File.separatorChar</li>
+     * <li>'\\' &#x2192; File.separatorChar</li>
+     * </ul>
+     *
+     * @param arg the argument to fix
+     * @return the transformed argument
      */
-    public static String backslash2Slash(String path) {
-        if (path == null) {
-            return null;
-        }
-        if (!path.startsWith(SLASH)) {
-            path = SLASH + path;
-        }
-        return path.replace("\\", SLASH);
+    public static String fixFileSeparatorChar(final String arg) {
+        return arg.replace(SLASH_CHAR, File.separatorChar).replace(BACKSLASH_CHAR, File.separatorChar);
     }
 }

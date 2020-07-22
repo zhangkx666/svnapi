@@ -58,7 +58,7 @@ public class SvnAdminForLocale implements ISvnAdmin {
 
         // execute svnadmin create command
         String repoPath = rootPath + "/" + repoName;
-        String command = "svnadmin create " + repoPath;
+        String command = "svnadmin create \"" + StringUtils.fixFileSeparatorChar(repoPath) + "\"";
 
         if (repoType != null) {
             command += " --fs-type " + repoType.getCode();
@@ -73,7 +73,7 @@ public class SvnAdminForLocale implements ISvnAdmin {
         // write svnserve.conf
         writeSvnserveConf(repoPath, repoName);
 
-        return StringUtils.backslash2Slash(repoPath);
+        return StringUtils.fixFileSeparatorChar(repoPath);
     }
 
     /**
@@ -84,14 +84,19 @@ public class SvnAdminForLocale implements ISvnAdmin {
      * @param newRepoName new repository name
      */
     @Override
-    public void moveRepository(String rootPath, String oldRepoName, String newRepoName) throws IOException {
+    public void moveRepository(String rootPath, String oldRepoName, String newRepoName) {
         if (StringUtils.isBlank(rootPath)) {
             rootPath = defaultSvnRootPath;
         }
         File oldFolder = new File(rootPath + "/" + oldRepoName);
         File newFolder = new File(rootPath + "/" + newRepoName);
-        logger.info("Move repository: " + oldFolder + " -> " + newFolder);
-        FileUtils.moveDirectory(oldFolder, newFolder);
+        try {
+            logger.info("Move repository: " + oldFolder + " -> " + newFolder);
+            FileUtils.moveDirectory(oldFolder, newFolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SvnApiException(e.getMessage());
+        }
     }
 
     /**
@@ -99,15 +104,19 @@ public class SvnAdminForLocale implements ISvnAdmin {
      *
      * @param rootPath root path
      * @param repoName repository name
-     * @throws IOException IOException
      */
     @Override
-    public void deleteRepository(String rootPath, String repoName) throws IOException {
+    public void deleteRepository(String rootPath, String repoName) {
         if (StringUtils.isBlank(rootPath)) {
             rootPath = defaultSvnRootPath;
         }
-        logger.info("Delete repository: " + repoName);
-        FileUtils.deleteDirectory(new File(rootPath + "/" + repoName));
+        try {
+            logger.info("Delete repository: " + repoName);
+            FileUtils.deleteDirectory(new File(StringUtils.fixFileSeparatorChar(rootPath + "/" + repoName)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SvnApiException(e.getMessage());
+        }
     }
 
     /**
@@ -166,13 +175,11 @@ public class SvnAdminForLocale implements ISvnAdmin {
     @Override
     public void restartSvnserve(String rootPath) {
 
-        // stop svnserve process
-        CommandUtils.stopProcess("svnserve");
-
         if (StringUtils.isBlank(rootPath)) {
             rootPath = defaultSvnRootPath;
         }
         if (CommandUtils.osIsLinux()) {
+            CommandUtils.execute("pkill svnserve", 5000);
             CommandUtils.execute("svnserve -d -r " + rootPath);
         } else if (CommandUtils.osIsWindows()) {
             throw new SvnApiException("EA0001", "Please restart the svnserve service manually on Windows.");

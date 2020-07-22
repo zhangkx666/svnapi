@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +73,7 @@ public class SvnClient implements ISvnClient {
         // execute svn mkdir command
         String fullPath = getFullPath(path);
         String command = "svn mkdir " + fullPath + " -q -m \"" + message + "\" --parents";
-        CommandUtils.execute(svnUser, command);
+        CommandUtils.execute(command);
         logger.info("mkdir: " + fullPath);
     }
 
@@ -122,12 +121,8 @@ public class SvnClient implements ISvnClient {
      */
     @Override
     public long headRevision() {
-        try {
-            String command = "svn info " + getRootPath() + " --show-item revision --no-newline";
-            return CommandUtils.executeForLong(svnUser, command);
-        } catch (IOException e) {
-            throw new SvnApiException(e.getMessage());
-        }
+        String command = "svn info " + getRootPath() + " --show-item revision --no-newline";
+        return CommandUtils.executeForLong(command);
     }
 
     /**
@@ -138,12 +133,8 @@ public class SvnClient implements ISvnClient {
      */
     @Override
     public long lastChangedRevision(String path) {
-        try {
-            String command = "svn info " + getFullPath(path) + " --show-item last-changed-revision --no-newline";
-            return CommandUtils.executeForLong(svnUser, command);
-        } catch (IOException e) {
-            throw new SvnApiException(e.getMessage());
-        }
+        String command = "svn info " + getFullPath(path) + " --show-item last-changed-revision --no-newline";
+        return CommandUtils.executeForLong(command);
     }
 
     /**
@@ -169,7 +160,7 @@ public class SvnClient implements ISvnClient {
             // command
             String command = "svn list " + parentFullPath + " --xml -r " + rev;
 
-            Document document = CommandUtils.executeForXmlDocument(svnUser, command);
+            Document document = CommandUtils.executeForXmlDocument(command);
             Element rootElement = document.getRootElement().element("list");
 
             // <list><entry></entry></list>
@@ -210,7 +201,7 @@ public class SvnClient implements ISvnClient {
                 list.add(svnEntry);
             });
             return list;
-        } catch (IOException | DocumentException e) {
+        } catch (DocumentException e) {
             e.printStackTrace();
         }
         return new ArrayList<>();
