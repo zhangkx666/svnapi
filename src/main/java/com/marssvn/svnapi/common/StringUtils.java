@@ -69,4 +69,37 @@ public class StringUtils {
     public static String fixFileSeparatorChar(final String arg) {
         return arg.replace(SLASH_CHAR, File.separatorChar).replace(BACKSLASH_CHAR, File.separatorChar);
     }
+
+    /**
+     * Get random password
+     * @param length password length
+     * @return random password
+     */
+    public static String createRandomPassword(int length) {
+        StringBuilder password = null;
+        String baseStr = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|<>?";
+        boolean flag = false;
+        while (!flag) {
+            password = new StringBuilder();
+            int a = 0, b = 0, c = 0, d = 0;
+            for (int i = 0; i < length; i++) {
+                int rand = (int) (Math.random() * baseStr.length());
+                password.append(baseStr.charAt(rand));
+                if (rand < 10) {
+                    a++;
+                }
+                if (10 <= rand && rand < 36) {
+                    b++;
+                }
+                if (36 <= rand && rand < 62) {
+                    c++;
+                }
+                if (62 <= rand) {
+                    d++;
+                }
+            }
+            flag = (a * b * c * d != 0);
+        }
+        return password.toString();
+    }
 }

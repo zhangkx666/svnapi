@@ -1,6 +1,6 @@
 package com.marssvn.svnapi;
 
-import com.marssvn.svnapi.enums.ERepositoryType;
+import com.marssvn.svnapi.model.SvnRepository;
 
 import java.io.IOException;
 
@@ -14,24 +14,11 @@ public interface ISvnAdmin {
     /**
      * createRepository a new repository
      *
-     * @param rootPath root path, use user.home if null
-     * @param repoName repository name
-     * @param repoType repository type, fsfs: FSFS(default), bdb: Berkeley DB
+     * @param svnRepository SvnRepository
      * @return repository path
      * @throws IOException IOException
      */
-    String createRepository(String rootPath, String repoName, ERepositoryType repoType) throws IOException;
-
-    /**
-     * createRepository a new repository
-     *
-     * @param repoName repository name
-     * @return repository path
-     * @throws IOException IOException
-     */
-    default String createRepository(String repoName) throws IOException {
-        return createRepository(null, repoName, null);
-    }
+    SvnRepository createRepository(SvnRepository svnRepository);
 
     /**
      * moveRepository repository
@@ -74,9 +61,10 @@ public interface ISvnAdmin {
     }
 
     /**
-     * restart svnserve
+     * restart svnserve service
+     *
      * @param rootPath root path
      * @throws IOException IOException
      */
-    void restartSvnserve(String rootPath) throws IOException;
+    void restartSvnService(String rootPath) throws IOException;
 }

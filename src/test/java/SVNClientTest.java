@@ -3,7 +3,10 @@ import com.marssvn.svnapi.SvnClient;
 import com.marssvn.svnapi.exception.SvnApiException;
 import com.marssvn.svnapi.model.SvnEntry;
 import com.marssvn.svnapi.model.SvnUser;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.util.List;
@@ -18,28 +21,37 @@ import java.util.List;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SVNClientTest {
 
-    private final static String REPOSITORY_NAME = "marssvn";
+    private final static String REPOSITORY_NAME = "test_2019_01";
+    private final static String PASSWORD = "_a*6s)FT0qO7|(6X";
     private ISvnClient svnClient;
+    private SvnUser svnUser;
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+//    @BeforeClass
+//    public static void beforeClass() throws Exception {
+//
 //        ISvnAdmin svnAdmin = new SvnAdminForLocale();
 //        svnAdmin.deleteRepository(REPOSITORY_NAME);
-//        svnAdmin.createRepository(REPOSITORY_NAME);
-    }
+//
+//        SvnRepository svnRepository = new SvnRepository();
+//        svnRepository.setName(REPOSITORY_NAME);
+//        svnAdmin.createRepository(svnRepository);
+//    }
 
-    @AfterClass
-    public static void afterClass() throws Exception {
-//        ISvnAdmin svnAdmin = new SvnAdminForLocale();
-//        svnAdmin.deleteRepository(REPOSITORY_NAME);
-    }
+//    @AfterClass
+//    public static void afterClass() throws Exception {
+//        ISvnAdmin adminUser = new SvnAdminForLocale();
+//        adminUser.deleteRepository(REPOSITORY_NAME);
+//    }
 
     @Before
     public void before() throws Exception {
-        if (svnClient == null) {
-            svnClient = new SvnClient();
-            svnClient.setRootPath("svn://localhost/" + REPOSITORY_NAME);
-            svnClient.setSvnUser(new SvnUser("marssvn", "marssvn"));
+        if (this.svnUser == null) {
+            this.svnUser = new SvnUser("marssvn", PASSWORD);
+        }
+        if (this.svnClient == null) {
+            this.svnClient = new SvnClient();
+            this.svnClient.setRootPath("svn://localhost/" + REPOSITORY_NAME);
+            this.svnClient.setSvnUser(this.svnUser);
         }
     }
 
@@ -68,9 +80,8 @@ public class SVNClientTest {
      */
     @Test(expected = SvnApiException.class)
     public void test03_MakeDir() {
-        SvnUser svnUser = new SvnUser("marssvn", "marssvn");
         ISvnClient svnClient1 = new SvnClient();
-        svnClient1.setSvnUser(svnUser);
+        svnClient1.setSvnUser(this.svnUser);
         svnClient1.mkdir("demo3", "test make dir demo");
     }
 

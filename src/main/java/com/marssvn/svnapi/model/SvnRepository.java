@@ -1,5 +1,8 @@
 package com.marssvn.svnapi.model;
 
+import com.marssvn.svnapi.common.StringUtils;
+import com.marssvn.svnapi.enums.ERepositoryType;
+import com.marssvn.svnapi.enums.ESvnProtocol;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,9 +16,9 @@ import lombok.Setter;
 public class SvnRepository {
 
     /**
-     * repository rootPath
+     * repository name
      */
-    private String rootPath;
+    private String name;
 
     /**
      * repository UUID
@@ -23,17 +26,48 @@ public class SvnRepository {
     private String uuid;
 
     /**
-     * head revision
+     * repository type
+     */
+    private ERepositoryType repositoryType;
+
+    /**
+     * svn protocol
+     */
+    private ESvnProtocol svnProtocol;
+
+    /**
+     * repository rootPathLocal
+     */
+    private String rootPathLocal;
+
+    /**
+     * head headRevision
      */
     private long headRevision;
 
     /**
      * admin account
      */
-    private String adminAccount;
+    private SvnUser adminUser;
 
     /**
-     * admin password
+     * Get Root Path, if root path is blank, return System.getProperty("user.home") + "/svn"
+     *
+     * @return Root Path
      */
-    private String adminPassword;
+    public String getRootPathLocal() {
+        if (StringUtils.isBlank(rootPathLocal)) {
+            rootPathLocal = System.getProperty("user.home") + "/svn";
+        }
+        return rootPathLocal;
+    }
+
+    /**
+     * get local full path
+     *
+     * @return full path (local)
+     */
+    public String getFullPathLocal() {
+        return StringUtils.fixFileSeparatorChar(this.getRootPathLocal() + "/" + name);
+    }
 }

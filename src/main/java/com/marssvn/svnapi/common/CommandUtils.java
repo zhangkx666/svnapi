@@ -92,6 +92,27 @@ public class CommandUtils {
     }
 
     /**
+     * execute command (Async)
+     *
+     * @param command command text
+     * @param timeout the timeout for the process in milliseconds.
+     * @return exit value
+     */
+    public static int executeAsync(String command, long timeout) {
+        return executeForProcessResultAsync(command, timeout, false).getExitValue();
+    }
+
+    /**
+     * execute command (Async)
+     *
+     * @param command command text
+     * @return exit value
+     */
+    public static int executeAsync(String command) {
+        return executeForProcessResultAsync(command, 0, false).getExitValue();
+    }
+
+    /**
      * execute command
      *
      * @param command command text
@@ -194,7 +215,7 @@ public class CommandUtils {
      * @return ProcessResult
      */
     private static ProcessResult executeForProcessResult(String command, long timeout, boolean readOutput) {
-        logger.info("execute command: " + command);
+        logger.debug("execute command: " + command);
 
         try {
             ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
@@ -225,21 +246,73 @@ public class CommandUtils {
      * execute for string (async)
      *
      * @param command command text
+     * @return string
+     */
+    public static String executeForStringAsync(String command) {
+        return executeForStringAsync(command, 0);
+    }
+
+    /**
+     * execute for string (async)
+     *
+     * @param command command text
      * @param timeout the timeout for the process in milliseconds.
      * @return string
      */
     public static String executeForStringAsync(String command, long timeout) {
-        logger.info("execute command: " + command);
+        return executeForProcessResultAsync(command, timeout, true).outputString();
+    }
+
+    /**
+     * execute for string (async) UTF8
+     *
+     * @param command command text
+     * @return string
+     */
+    public static String executeForStringAsyncUTF8(String command) {
+        return executeForStringAsync(command, 0);
+    }
+
+    /**
+     * execute for string (async) UTF8
+     *
+     * @param command command text
+     * @param timeout the timeout for the process in milliseconds.
+     * @return string
+     */
+    public static String executeForStringAsyncUTF8(String command, long timeout) {
+        return executeForProcessResultAsync(command, timeout, true).outputUTF8();
+    }
+
+    /**
+     * execute command for ProcessResult (async)
+     *
+     * @param command command text
+     * @param timeout the timeout for the process in milliseconds.
+     * @return ProcessResult
+     */
+    private static ProcessResult executeForProcessResultAsync(String command, long timeout, boolean readOutput) {
+        logger.debug("execute command: " + command);
 
         try {
+            ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
             Future<ProcessResult> future = new ProcessExecutor()
                     .command(parseCommand(command))
-                    .readOutput(true)
-                    .exitValue(0)
+                    .redirectError(errorStream)
+                    .readOutput(readOutput)
+//                    .exitValue(0)
                     .start().getFuture();
 
             ProcessResult processResult = future.get(timeout > 0 ? timeout : DEFAULT_TIME_OUT_M, TimeUnit.MILLISECONDS);
-            return processResult.outputString();
+
+            // throw exception if has error when execute command
+            String executeError = errorStream.toString(Charset.defaultCharset());
+            if (StringUtils.isNotBlank(executeError)) {
+                throw new SvnApiException(executeError);
+            }
+
+            return processResult;
 
         } catch (InvalidExitValueException e) {
             throw new SvnApiException("Unexpected exit value");

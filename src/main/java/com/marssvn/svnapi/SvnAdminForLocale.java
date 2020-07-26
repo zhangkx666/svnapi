@@ -2,8 +2,10 @@ package com.marssvn.svnapi;
 
 import com.marssvn.svnapi.common.CommandUtils;
 import com.marssvn.svnapi.common.StringUtils;
-import com.marssvn.svnapi.enums.ERepositoryType;
+import com.marssvn.svnapi.enums.ESvnProtocol;
 import com.marssvn.svnapi.exception.SvnApiException;
+import com.marssvn.svnapi.model.SvnRepository;
+import com.marssvn.svnapi.model.SvnUser;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,43 +39,48 @@ public class SvnAdminForLocale implements ISvnAdmin {
     /**
      * createRepository a new repository
      *
-     * @param rootPath root path, use user.home if null
-     * @param repoName repository name
-     * @param repoType repository type, fsfs: FSFS(default), bdb: Berkeley DB
+     * @param svnRepository SvnRepository
      * @return repository path
      */
     @Override
-    public String createRepository(String rootPath, String repoName, ERepositoryType repoType) throws IOException {
+    public SvnRepository createRepository(SvnRepository svnRepository) {
+        try {
 
-        // svn root path, here we use use home path
-        if (StringUtils.isBlank(rootPath)) {
-            rootPath = defaultSvnRootPath;
+            // if repository root path not exists, mkdir
+            File repoRoot = new File(svnRepository.getRootPathLocal());
+            if (!repoRoot.exists()) {
+                FileUtils.forceMkdir(repoRoot);
+            }
+
+            // execute svnadmin create command
+            String repoName = svnRepository.getName();
+            String repoPathLocal = svnRepository.getFullPathLocal();
+            String command = "svnadmin create \"" + StringUtils.fixFileSeparatorChar(repoPathLocal) + "\"";
+
+            if (svnRepository.getRepositoryType() != null) {
+                command += " --fs-type " + svnRepository.getRepositoryType().getCode();
+            }
+
+            logger.info("Create repository: " + repoName);
+            CommandUtils.executeAsync(command);
+
+            // backup svn repository settings
+            backupSettings(repoPathLocal);
+
+            // svn admin
+            SvnUser svnAdmin = new SvnUser("marssvn", StringUtils.createRandomPassword(16));
+            svnRepository.setAdminUser(svnAdmin);
+            logger.debug("password: " + svnAdmin.getPassword());
+
+            // write svnserve.conf
+            writeSvnserveConf(svnRepository);
+
+            svnRepository.setSvnProtocol(ESvnProtocol.SVN);
+            return svnRepository;
+
+        } catch (IOException e) {
+            throw new SvnApiException("EA0001", e.getMessage());
         }
-
-        // if repository root path not exists, mkdir
-        File repoRoot = new File(rootPath);
-        if (!repoRoot.exists()) {
-            FileUtils.forceMkdir(repoRoot);
-        }
-
-        // execute svnadmin create command
-        String repoPath = rootPath + "/" + repoName;
-        String command = "svnadmin create \"" + StringUtils.fixFileSeparatorChar(repoPath) + "\"";
-
-        if (repoType != null) {
-            command += " --fs-type " + repoType.getCode();
-        }
-
-        logger.info("Create repository: " + repoName);
-        CommandUtils.execute(command);
-
-        // backup svn repository settings
-        backupSettings(repoPath);
-
-        // write svnserve.conf
-        writeSvnserveConf(repoPath, repoName);
-
-        return StringUtils.fixFileSeparatorChar(repoPath);
     }
 
     /**
@@ -94,8 +101,7 @@ public class SvnAdminForLocale implements ISvnAdmin {
             logger.info("Move repository: " + oldFolder + " -> " + newFolder);
             FileUtils.moveDirectory(oldFolder, newFolder);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new SvnApiException(e.getMessage());
+            throw new SvnApiException("EA0002", e.getMessage());
         }
     }
 
@@ -114,8 +120,7 @@ public class SvnAdminForLocale implements ISvnAdmin {
             logger.info("Delete repository: " + repoName);
             FileUtils.deleteDirectory(new File(StringUtils.fixFileSeparatorChar(rootPath + "/" + repoName)));
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new SvnApiException(e.getMessage());
+            throw new SvnApiException("EA0003", e.getMessage());
         }
     }
 
@@ -141,19 +146,19 @@ public class SvnAdminForLocale implements ISvnAdmin {
     /**
      * write svnserve.conf
      *
-     * @param repoPath repository path
-     * @param repoName repository name
+     * @param svnRepository SvnRepository
      */
-    private void writeSvnserveConf(String repoPath, String repoName) throws IOException {
+    private void writeSvnserveConf(SvnRepository svnRepository) throws IOException {
 
         // write svnserve.conf
+        String repoPath = svnRepository.getFullPathLocal();
         String confPath = repoPath + "/conf/svnserve.conf";
         String confText = "[general]\n";
         confText += "anon-access = none\n";
         confText += "auth-access = write\n";
         confText += "password-db = passwd\n";
         confText += "authz-db = authz\n";
-        confText += "realm = " + repoName;
+        confText += "realm = " + svnRepository.getName();
         FileUtils.writeStringToFile(new File(confPath), confText, "UTF-8");
 
         // write authz
@@ -163,26 +168,26 @@ public class SvnAdminForLocale implements ISvnAdmin {
 
         // write passwd
         String passwdPath = repoPath + "/conf/passwd";
-        String passwdText = "[users]\nmarssvn = marssvn";
+        String passwdText = "[users]\nmarssvn = " + svnRepository.getAdminUser().getPassword();
         FileUtils.writeStringToFile(new File(passwdPath), passwdText, "UTF-8");
     }
 
     /**
-     * restart svnserve
+     * restart svnserve service
      *
      * @param rootPath root path
      */
     @Override
-    public void restartSvnserve(String rootPath) {
+    public void restartSvnService(String rootPath) {
 
         if (StringUtils.isBlank(rootPath)) {
             rootPath = defaultSvnRootPath;
         }
         if (CommandUtils.osIsLinux()) {
             CommandUtils.execute("pkill svnserve", 5000);
-            CommandUtils.execute("svnserve -d -r " + rootPath);
+            CommandUtils.execute("svnserve -d -r \"" + rootPath + "\"");
         } else if (CommandUtils.osIsWindows()) {
-            throw new SvnApiException("EA0001", "Please restart the svnserve service manually on Windows.");
+            throw new SvnApiException("EA0004", "Please restart the svnserve service manually on Windows.");
         }
     }
 }

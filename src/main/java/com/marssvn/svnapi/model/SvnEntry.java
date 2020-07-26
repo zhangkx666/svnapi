@@ -38,12 +38,12 @@ public class SvnEntry extends BaseBean {
     private String fullPath;
 
     /**
-     * revision (head revision)
+     * headRevision (head headRevision)
      */
-    private long revision;
+    private long headRevision;
 
     /**
-     * commit revision (last changed)
+     * last changed revision
      */
     private long commitRevision;
 
@@ -63,7 +63,7 @@ public class SvnEntry extends BaseBean {
     private String commitMessage;
 
     /**
-     * file size
+     * file size (byte)
      */
     private long size;
 

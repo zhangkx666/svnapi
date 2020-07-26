@@ -13,7 +13,7 @@ import java.util.Date;
 public class LogEntry {
 
     /**
-     * commit revision
+     * commit headRevision
      */
     private long revision;
 

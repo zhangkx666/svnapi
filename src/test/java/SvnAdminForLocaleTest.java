@@ -1,6 +1,7 @@
 import com.marssvn.svnapi.ISvnAdmin;
 import com.marssvn.svnapi.SvnAdminForLocale;
 import com.marssvn.svnapi.exception.SvnApiException;
+import com.marssvn.svnapi.model.SvnRepository;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -20,13 +21,15 @@ public class SvnAdminForLocaleTest {
         ISvnAdmin svnAdmin = new SvnAdminForLocale();
         String repoName = "test_2019_01";
         svnAdmin.deleteRepository(repoName);
-        svnAdmin.createRepository(repoName);
+        SvnRepository svnRepository = new SvnRepository();
+        svnRepository.setName(repoName);
+        svnAdmin.createRepository(svnRepository);
     }
 
     @Test(expected = SvnApiException.class)
     public void test02_RestartSvnserve() throws IOException {
         ISvnAdmin svnAdmin = new SvnAdminForLocale();
-        svnAdmin.restartSvnserve(null);
+        svnAdmin.restartSvnService(null);
     }
 
     /**
@@ -34,10 +37,11 @@ public class SvnAdminForLocaleTest {
      */
     @Test(expected = SvnApiException.class)
     public void test03_CreateExistsRepository() throws Exception {
-        ISvnAdmin svnAdmin = new SvnAdminForLocale();
-        String repoName = "test_2019_01";
+        SvnRepository svnRepository = new SvnRepository();
+        svnRepository.setName("test_2019_01");
 
-        svnAdmin.createRepository(repoName);
+        ISvnAdmin svnAdmin = new SvnAdminForLocale();
+        svnAdmin.createRepository(svnRepository);
     }
 
     /**

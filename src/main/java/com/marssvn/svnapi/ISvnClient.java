@@ -34,16 +34,16 @@ public interface ISvnClient {
     void mkdir(String dirPath, String message);
 
     /**
-     * get head revision of path
+     * get head headRevision of path
      *
-     * @return head revision
+     * @return head headRevision
      */
     long headRevision();
 
     /**
-     * get last changed revision
+     * get last changed headRevision
      * @param path path
-     * @return last changed revision
+     * @return last changed headRevision
      */
     public long lastChangedRevision(String path);
 
@@ -59,14 +59,14 @@ public interface ISvnClient {
      * svn info
      *
      * @param path     file or directory path
-     * @param revision revision, default is HEAD
+     * @param revision headRevision, default is HEAD
      * @return info
      */
     String info(String path, long revision);
 
     /**
      * @param filePath file path
-     * @param revision revision, default is HEAD
+     * @param revision headRevision, default is HEAD
      * @return blame string
      */
     String blame(String filePath, long revision);
@@ -86,7 +86,7 @@ public interface ISvnClient {
      * svn command: svn list
      *
      * @param path     relative path
-     * @param revision revision
+     * @param revision headRevision
      * @return entry list
      */
     List<SvnEntry> list(String path, long revision);
@@ -122,7 +122,7 @@ public interface ISvnClient {
      * get file content of text file
      *
      * @param filePath file path
-     * @param revision revision, default is HEAD
+     * @param revision headRevision, default is HEAD
      * @return file content
      */
     String getFileContent(String filePath, long revision);
@@ -142,7 +142,7 @@ public interface ISvnClient {
      * export exports a clean directory tree from the repository
      *
      * @param path     path
-     * @param revision revision, default is HEAD
+     * @param revision headRevision, default is HEAD
      * @return string
      */
     String export(String path, long revision);
@@ -151,8 +151,8 @@ public interface ISvnClient {
      * Display local changes or differences between two revisions or paths
      *
      * @param filePath     file path
-     * @param olderVersion old revision
-     * @param newerVision  new revision
+     * @param olderVersion old headRevision
+     * @param newerVision  new headRevision
      * @return differences
      */
     String diff(String filePath, long olderVersion, long newerVision);
